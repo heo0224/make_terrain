@@ -15,8 +15,10 @@ bool Context::init() {
     shader = std::make_unique<Shader>("../shaders/shader.vs", "../shaders/shader.fs");
     shader->use();
     shader->setInt("texture0", 0);
-    texture = std::make_shared<Texture>("../assets/container.jpg");
+    containertexture = std::make_shared<Texture>("../assets/container.jpg");
+    grassGroundtexture = std::make_shared<Texture>("../assets/grass_ground.jpg");
     cubeVAO = generatePositionTextureVAO(cubePositionsTextures, sizeof(cubePositionsTextures));
+    quadVAO = generatePositionTextureVAOWithEBO(quad_positions_textures, sizeof(quad_positions_textures), quad_indices, sizeof(quad_indices));
 
     glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
     glEnable(GL_DEPTH_TEST);
@@ -79,11 +81,26 @@ void Context::render() {
     shader->setMat4("projection", projection);
     shader->setMat4("view", view);
     shader->setMat4("model", model);
+
+    // cube
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture->ID);
+    glBindTexture(GL_TEXTURE_2D, containertexture->ID);
     glBindVertexArray(cubeVAO);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 1.0f, -2.0f));
+    model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+    shader->setMat4("model", model);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    return;
+
+    // ground
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, grassGroundtexture->ID);
+    glBindVertexArray(quadVAO);
+    model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(grassGroundSize));
+    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    shader->setMat4("model", model);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 void Context::renderGUI() {
@@ -91,6 +108,7 @@ void Context::renderGUI() {
         if (ImGui::ColorEdit4("clear color", glm::value_ptr(clearColor))) {
             glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
         }
+        ImGui::SliderFloat("grass ground size", &grassGroundSize, 10.0f, 30.0f);
         ImGui::Separator();
         if (ImGui::Button("reset camera")) {
             camera->reset();
