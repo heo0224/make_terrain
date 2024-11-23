@@ -12,7 +12,7 @@ set(WINDOW_HEIGHT 720)
 project(${PROJECT_NAME} C CXX)
 
 # specify the files to compile
-file(GLOB_RECURSE SOURCES
+file(GLOB SOURCES
   ${CMAKE_SOURCE_DIR}/src/*.cpp
   ${CMAKE_SOURCE_DIR}/includes/*.h
 )
