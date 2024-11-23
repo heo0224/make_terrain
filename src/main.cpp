@@ -71,6 +71,7 @@ int main(int argc, const char** argv) {
 
         context->updateDeltaTime();
         context->processInput(window);
+        context->renderGUI();
         context->render();
 
         ImGui::Render();

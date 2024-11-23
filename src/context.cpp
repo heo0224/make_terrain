@@ -1,6 +1,7 @@
 #include "context.h"
 #include "geometry_primitives.h"
 #include "utils.h"
+#include <imgui.h>
 
 std::unique_ptr<Context> Context::create() {
     auto context = std::unique_ptr<Context>(new Context());
@@ -17,6 +18,7 @@ bool Context::init() {
     texture = std::make_shared<Texture>("../assets/container.jpg");
     cubeVAO = generatePositionTextureVAO(cubePositionsTextures, sizeof(cubePositionsTextures));
 
+    glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
     glEnable(GL_DEPTH_TEST);
     return true;
 }
@@ -68,7 +70,6 @@ void Context::mouseButton(int button, int action, double x, double y) {
 }
 
 void Context::render() {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)this->width / (float)this->height, 0.1f, 100.0f);
@@ -83,4 +84,17 @@ void Context::render() {
     glBindVertexArray(cubeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     return;
+}
+
+void Context::renderGUI() {
+    if (ImGui::Begin("UI Window Example")) {
+        if (ImGui::ColorEdit4("clear color", glm::value_ptr(clearColor))) {
+            glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
+        }
+        ImGui::Separator();
+        if (ImGui::Button("reset camera")) {
+            camera->reset();
+        }
+    }
+    ImGui::End();
 }
