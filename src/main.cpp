@@ -69,6 +69,7 @@ int main(int argc, const char** argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        context->updateDeltaTime();
         context->processInput(window);
         context->render();
 
