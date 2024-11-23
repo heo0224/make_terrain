@@ -4,5 +4,6 @@
 #include "common.h"
 
 unsigned int generatePositionTextureVAO(const float* vertices, unsigned int vertexSize);
+unsigned int generatePositionTextureVAOWithEBO(const float* vertices, unsigned int vertexSize, const unsigned int* indices, unsigned int indexSize);
 
 #endif // __UTILS_H__
