@@ -10,6 +10,7 @@ class Context {
 public:
     static std::unique_ptr<Context> create();
     void render();
+    void renderGUI();
     void updateDeltaTime();
     void processInput(GLFWwindow* window);
     void reshape(int width, int height);
@@ -26,6 +27,8 @@ private:
 
     int width = WINDOW_WIDTH;
     int height = WINDOW_HEIGHT;
+
+    glm::vec4 clearColor = glm::vec4(0.2f, 0.3f, 0.3f, 1.0f);
 
     bool firstMouse = true;
     float lastX = WINDOW_WIDTH / 2.0f;

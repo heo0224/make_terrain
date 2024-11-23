@@ -48,6 +48,7 @@ public:
     void processKeyboard(Camera_Movement direction, float deltaTime);
     void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     void processMouseScroll(float yoffset);
+    void reset();
 private:
     void updateCameraVectors();
 };
