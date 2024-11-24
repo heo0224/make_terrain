@@ -76,7 +76,7 @@ void Camera::processMouseScroll(float yoffset) {
 void Camera::reset() {
     yaw = YAW;
     pitch = PITCH;
-    position = glm::vec3(0.0f, 0.0f, 0.0f);
+    position = CAMERA_POSITION;
     updateCameraVectors();
 }
 
