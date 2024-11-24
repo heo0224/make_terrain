@@ -28,7 +28,7 @@ private:
 
     int width = WINDOW_WIDTH;
     int height = WINDOW_HEIGHT;
-    bool firstMouse = true;
+    bool cameraMouseControlActivated = false;
     float lastX = WINDOW_WIDTH / 2.0f;
     float lastY = WINDOW_HEIGHT / 2.0f;
     float deltaTime = 0.0f;

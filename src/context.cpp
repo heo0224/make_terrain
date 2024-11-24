@@ -53,12 +53,9 @@ void Context::reshape(int width, int height) {
 }
 
 void Context::mouseMove(double x, double y) {
-    if (firstMouse)
-    {
-        lastX = x;
-        lastY = y;
-        firstMouse = false;
-    }
+    if (!cameraMouseControlActivated)
+        return;
+
     float xoffset = x - lastX;
     float yoffset = lastY - y; // reversed since y-coordinates go from bottom to top
 
@@ -68,7 +65,14 @@ void Context::mouseMove(double x, double y) {
 }
 
 void Context::mouseButton(int button, int action, double x, double y) {
-    return;
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        cameraMouseControlActivated = true;
+        lastX = x;
+        lastY = y;
+    }
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+        cameraMouseControlActivated = false;
+    }
 }
 
 void Context::render() {
@@ -108,7 +112,7 @@ void Context::renderGUI() {
         if (ImGui::ColorEdit4("clear color", glm::value_ptr(clearColor))) {
             glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
         }
-        ImGui::SliderFloat("grass ground size", &grassGroundSize, 10.0f, 30.0f);
+        ImGui::SliderFloat("grass ground size", &grassGroundSize, 10.0f, 60.0f);
         ImGui::Separator();
         if (ImGui::Button("reset camera")) {
             camera->reset();
