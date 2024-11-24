@@ -86,9 +86,9 @@ void Camera::updateCameraVectors() {
     front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     front.y = sin(glm::radians(pitch));
     front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front = glm::normalize(front);
+    this->front = glm::normalize(front);
 
     // Also re-calculate the Right and Up vector
-    right = glm::normalize(glm::cross(front, worldUp));  // Normalize the vectors
-    up = glm::normalize(glm::cross(right, front));
+    this->right = glm::normalize(glm::cross(this->front, this->worldUp));  // Normalize the vectors
+    this->up = glm::normalize(glm::cross(this->right, this->front));
 }
