@@ -23,6 +23,7 @@ private:
 
     std::unique_ptr<Camera> camera;
     std::unique_ptr<Shader> shader;
+    std::unique_ptr<Shader> watershader;
     std::shared_ptr<Texture> containertexture;
     std::shared_ptr<Texture> grassGroundtexture;
 
@@ -37,6 +38,8 @@ private:
     glm::vec4 clearColor = glm::vec4(0.2f, 0.3f, 0.3f, 1.0f);
 
     float grassGroundSize = 20.0f;
+    float waterSize = 20.0f;
+    float waterHeight = 0.0f;
 
     unsigned int cubeVAO;
     unsigned int quadVAO;
