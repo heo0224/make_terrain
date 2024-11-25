@@ -15,6 +15,10 @@ bool Context::init() {
     shader = std::make_unique<Shader>("../shaders/shader.vs", "../shaders/shader.fs");
     shader->use();
     shader->setInt("texture0", 0);
+
+    watershader = std::make_unique<Shader>("../shaders/shader_water.vs", "../shaders/shader_water.fs");
+    watershader->use();
+
     containertexture = std::make_shared<Texture>("../assets/container.jpg");
     grassGroundtexture = std::make_shared<Texture>("../assets/grass_ground.jpg");
     cubeVAO = generatePositionTextureVAO(cubePositionsTextures, sizeof(cubePositionsTextures));
@@ -105,6 +109,19 @@ void Context::render() {
     model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->setMat4("model", model);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    
+    //water
+    glBindVertexArray(quadVAO);
+    model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(waterSize));
+    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, waterHeight));
+    watershader->use();
+    watershader->setMat4("projection", projection);
+    watershader->setMat4("view", view);
+    watershader->setMat4("model", model);
+
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 void Context::renderGUI() {
@@ -113,6 +130,7 @@ void Context::renderGUI() {
             glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
         }
         ImGui::SliderFloat("grass ground size", &grassGroundSize, 10.0f, 60.0f);
+        ImGui::SliderFloat("water height", &waterHeight, -1.0f, 1.0f);
         ImGui::Separator();
         if (ImGui::Button("reset camera")) {
             camera->reset();
