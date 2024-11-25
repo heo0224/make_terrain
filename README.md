@@ -19,7 +19,7 @@ make_terrain
 
 ### Build Troubleshooting
 - install dependencies:
-  - `sudo apt install libsoil-dev libglm-dev libassimp-dev libglew-dev libglfw3-dev libxinerama-dev libxcursor-dev libxi-dev libfreetype-dev libgl1-mesa-dev xorg-dev ninja-build`
+  - `sudo apt install libsoil-dev libglm-dev libassimp-dev libglew-dev libglfw3-dev libxinerama-dev libxcursor-dev libxi-dev libfreetype-dev libgl1-mesa-dev xorg-dev ninja-build libxkbcommon-x11-dev`
 - compiler version
   - tested on gcc 9.4.0 
 
