@@ -1,7 +1,5 @@
 #include "common.h"
 #include "texture.h"
-
-#define STB_IMAGE_IMPLEMENTATION  // use of stb functions once and for all
 #include <stb/stb_image.h>
 
 Texture::Texture(const char* filePath) {
