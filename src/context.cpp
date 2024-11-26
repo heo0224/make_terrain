@@ -16,11 +16,31 @@ bool Context::init() {
     shader->use();
     shader->setInt("texture0", 0);
 
+    skyboxshader = std::make_unique<Shader>("../shaders/shader_skybox.vs", "../shaders/shader_skybox.fs");
+    skyboxshader->setInt("skyboxTexture1", 0);
+
     watershader = std::make_unique<Shader>("../shaders/shader_water.vs", "../shaders/shader_water.fs");
-    watershader->use();
 
     containertexture = std::make_shared<Texture>("../assets/container.jpg");
     grassGroundtexture = std::make_shared<Texture>("../assets/grass_ground.jpg");
+
+    //skybox
+    std::vector<std::string> skybox_faces
+    {
+        "../assets/skybox/right.tga",
+        "../assets/skybox/left.tga",
+        "../assets/skybox/top.tga",
+        "../assets/skybox/bottom.tga",
+        "../assets/skybox/front.tga",
+        "../assets/skybox/back.tga"
+    };
+    skyboxTexture = std::make_shared<CubemapTexture>(skybox_faces);
+    // int size = sizeof(skybox_positions) / sizeof(skybox_positions[0]);
+    // for (int i = 0; i < size; ++i) {
+    //     skybox_positions[i] *= 100.0f;
+    // }
+    getPositionVAO(skybox_positions, sizeof(skybox_positions), VAOskybox, VBOskybox);
+
     cubeVAO = generatePositionTextureVAO(cubePositionsTextures, sizeof(cubePositionsTextures));
     quadVAO = generatePositionTextureVAOWithEBO(quad_positions_textures, sizeof(quad_positions_textures), quad_indices, sizeof(quad_indices));
 
@@ -109,7 +129,7 @@ void Context::render() {
     model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->setMat4("model", model);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    
+
     //water
     glBindVertexArray(quadVAO);
     model = glm::mat4(1.0f);
@@ -122,13 +142,28 @@ void Context::render() {
     watershader->setMat4("model", model);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    
+    // skybox
+    skyboxshader->use();
+    glDepthFunc(GL_LEQUAL);
+    view = glm::mat4(glm::mat3(camera->getViewMatrix()));
+    skyboxshader->setMat4("view", view);
+    skyboxshader->setMat4("projection", projection);
+
+    glBindVertexArray(VAOskybox);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture->textureID);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glBindVertexArray(0);
+    glDepthFunc(GL_LESS);
 }
 
 void Context::renderGUI() {
     if (ImGui::Begin("UI Window Example")) {
-        if (ImGui::ColorEdit4("clear color", glm::value_ptr(clearColor))) {
-            glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-        }
+        // if (ImGui::ColorEdit4("clear color", glm::value_ptr(clearColor))) {
+        //     glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
+        // }
         ImGui::SliderFloat("grass ground size", &grassGroundSize, 10.0f, 60.0f);
         ImGui::SliderFloat("water height", &waterHeight, -1.0f, 1.0f);
         ImGui::Separator();
