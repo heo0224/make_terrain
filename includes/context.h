@@ -23,9 +23,11 @@ private:
 
     std::unique_ptr<Camera> camera;
     std::unique_ptr<Shader> shader;
+    std::unique_ptr<Shader> skyboxshader;
     std::unique_ptr<Shader> watershader;
     std::shared_ptr<Texture> containertexture;
     std::shared_ptr<Texture> grassGroundtexture;
+    std::shared_ptr<CubemapTexture> skyboxTexture;
 
     int width = WINDOW_WIDTH;
     int height = WINDOW_HEIGHT;
@@ -43,6 +45,7 @@ private:
 
     unsigned int cubeVAO;
     unsigned int quadVAO;
+    unsigned int VAOskybox, VBOskybox;
 };
 
 #endif // __CONTEXT_H__

@@ -11,4 +11,14 @@ public:
     Texture(const char* filePath);
 };
 
+class CubemapTexture{
+public:
+    unsigned int textureID;
+    int width;
+    int height;
+    int channels;
+
+    CubemapTexture(std::vector<std::string> faces);
+};
+
 #endif  // __TEXTURE_H__
