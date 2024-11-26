@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <iostream>
 #include <optional>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
