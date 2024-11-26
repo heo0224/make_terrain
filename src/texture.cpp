@@ -13,6 +13,7 @@ Texture::Texture(const char* filePath) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(filePath, &width, &height, &channels, 0);
+    SPDLOG_INFO("Image loaded: path: {} width: {}, height: {}, channels: {}", filePath, width, height, channels);
     if (data)
     {
         if (channels == 3) {
@@ -22,11 +23,11 @@ Texture::Texture(const char* filePath) {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         }
         glGenerateMipmap(GL_TEXTURE_2D);
-        SPDLOG_INFO("Texture loaded: path: {} width: {}, height: {}, channels: {}", filePath, width, height, channels);
+        SPDLOG_INFO("Texture loaded");
     }
     else
     {
-        SPDLOG_ERROR("Failed to load texture: {}", filePath);
+        SPDLOG_ERROR("Failed to load texture");
     }
     stbi_image_free(data);
 }
@@ -38,7 +39,7 @@ CubemapTexture::CubemapTexture(std::vector<std::string> faces)
     stbi_set_flip_vertically_on_load(false);
     for (unsigned int i = 0; i < faces.size(); i++)
     {
-        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &channels, 0);
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &channels, 0);
         if (data)
         {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
