@@ -15,6 +15,7 @@ project(${PROJECT_NAME} C CXX)
 file(GLOB SOURCES
   ${CMAKE_SOURCE_DIR}/src/*.cpp
   ${CMAKE_SOURCE_DIR}/includes/*.h
+  ${CMAKE_SOURCE_DIR}/lib/stb_image.cpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 
