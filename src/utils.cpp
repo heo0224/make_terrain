@@ -1,20 +1,24 @@
 #include "utils.h"
 
-unsigned int generatePositionVAO(const float* vertices, unsigned int size)
+unsigned int generatePositionVAO(const float* vertices, unsigned int vertexSize)
 {
     unsigned int VAO, VBO;
-    
-    //unsigned int VBO;
+
+    // Generate and bind VAO
     glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
+
+    // Generate and bind VBO
+    glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexSize, vertices, GL_STATIC_DRAW);
 
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // Unbind VAO (optional)
+    glBindVertexArray(0);
 
     return VAO;
 }
@@ -76,9 +80,4 @@ unsigned int generatePositionTextureVAOWithEBO(const float* vertices, unsigned i
     glBindVertexArray(0);
 
     return VAO;
-}
-
-float clamp(float x, float x_min, float x_max)
-{
-    return x < x_min ? x_min : (x > x_max ? x_max : x);
 }
