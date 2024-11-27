@@ -32,7 +32,7 @@ Texture::Texture(const char* filePath) {
     stbi_image_free(data);
 }
 
-CubemapTexture::CubemapTexture(std::vector<std::string> faces)
+CubemapTexture::CubemapTexture(const std::vector<std::string>& faces)
 {
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
