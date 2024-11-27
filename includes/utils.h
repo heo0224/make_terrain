@@ -3,6 +3,7 @@
 
 #include "common.h"
 
+unsigned int generatePositionVAO(const float* vertices, unsigned int size);
 unsigned int generatePositionTextureVAO(const float* vertices, unsigned int vertexSize);
 unsigned int generatePositionTextureVAOWithEBO(const float* vertices, unsigned int vertexSize, const unsigned int* indices, unsigned int indexSize);
 
@@ -13,8 +14,6 @@ public:
     //std::vector<unsigned int> associatedVBOs;
 };
 
-VAO *getVAOFromAttribData(const std::vector<float> &attrib_data, const std::vector<unsigned int> &attrib_sizes);
-void getPositionVAO(const float* vertices, unsigned int size, unsigned int& VAO, unsigned int& VBO);
-
-
+// Math utils
+float clamp(float x, float x_min, float x_max);
 #endif // __UTILS_H__
