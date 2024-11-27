@@ -23,6 +23,15 @@ unsigned int generatePositionVAO(const float* vertices, unsigned int vertexSize)
     return VAO;
 }
 
+unsigned int generatePositionVAO(const std::vector<float>& vertices)
+{
+    return generatePositionVAO(
+        vertices.data(),
+        vertices.size() * sizeof(float)
+    );
+}
+
+
 unsigned int generatePositionTextureVAO(const float* vertices, unsigned int vertexSize) {
     unsigned int VAO, VBO;
 
@@ -48,6 +57,13 @@ unsigned int generatePositionTextureVAO(const float* vertices, unsigned int vert
     glBindVertexArray(0);
 
     return VAO;
+}
+
+unsigned int generatePositionTextureVAO(const std::vector<float>& vertices) {
+    return generatePositionTextureVAO(
+        vertices.data(),
+        vertices.size() * sizeof(float)
+    );
 }
 
 unsigned int generatePositionTextureVAOWithEBO(const float* vertices, unsigned int vertexSize, const unsigned int* indices, unsigned int indexSize) {
@@ -80,4 +96,13 @@ unsigned int generatePositionTextureVAOWithEBO(const float* vertices, unsigned i
     glBindVertexArray(0);
 
     return VAO;
+}
+
+unsigned int generatePositionTextureVAOWithEBO(const std::vector<float>& vertices, const std::vector<unsigned int>& indices) {
+    return generatePositionTextureVAOWithEBO(
+        vertices.data(),
+        vertices.size() * sizeof(float),
+        indices.data(),
+        indices.size() * sizeof(unsigned int)
+    );
 }
