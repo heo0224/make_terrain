@@ -154,6 +154,17 @@ void Context::render() {
 
 void Context::renderGUI() {
     if (ImGui::Begin("UI Window Example")) {
+        ImGui::Text("Rendering Mode");
+        if (ImGui::RadioButton("Fill", !wireFrameMode)) {
+            wireFrameMode = false;
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Wireframe", wireFrameMode)) {
+            wireFrameMode = true;
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        ImGui::Separator();
         ImGui::SliderFloat("grass ground size", &grassGroundSize, 10.0f, 60.0f);
         ImGui::SliderFloat("water height", &waterHeight, -1.0f, 1.0f);
         ImGui::Separator();
