@@ -18,7 +18,7 @@ public:
     int height;
     int channels;
 
-    CubemapTexture(std::vector<std::string> faces);
+    CubemapTexture(const std::vector<std::string>& faces);
 };
 
 #endif  // __TEXTURE_H__
