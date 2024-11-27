@@ -45,6 +45,7 @@ private:
     float grassGroundSize = 20.0f;
     float waterSize = 20.0f;
     float waterHeight = 0.0f;
+    bool wireFrameMode = false;
 
     unsigned int cubeVAO;
     unsigned int quadVAO;
