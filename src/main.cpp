@@ -99,7 +99,7 @@ void OnFramebufferSizeChange(GLFWwindow* window, int width, int height) {
 void OnKeyEvent(GLFWwindow* window,
     int key, int scancode, int action, int mods) {
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
-    SPDLOG_INFO("key: {}, scancode: {}, action: {}, mods: {}{}{}",
+    SPDLOG_DEBUG("key: {}, scancode: {}, action: {}, mods: {}{}{}",
         key, scancode,
         action == GLFW_PRESS ? "Pressed" :
         action == GLFW_RELEASE ? "Released" :
