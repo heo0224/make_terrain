@@ -35,12 +35,8 @@ bool Context::init() {
         "../assets/skybox/back.tga"
     };
     skyboxTexture = std::make_shared<CubemapTexture>(skybox_faces);
-    // int size = sizeof(skybox_positions) / sizeof(skybox_positions[0]);
-    // for (int i = 0; i < size; ++i) {
-    //     skybox_positions[i] *= 100.0f;
-    // }
-    getPositionVAO(skybox_positions, sizeof(skybox_positions), VAOskybox, VBOskybox);
 
+    skyboxVAO = generatePositionVAO(skybox_positions, sizeof(skybox_positions));
     cubeVAO = generatePositionTextureVAO(cubePositionsTextures, sizeof(cubePositionsTextures));
     quadVAO = generatePositionTextureVAOWithEBO(quad_positions_textures, sizeof(quad_positions_textures), quad_indices, sizeof(quad_indices));
 
@@ -150,7 +146,7 @@ void Context::render() {
     skyboxshader->setMat4("view", view);
     skyboxshader->setMat4("projection", projection);
 
-    glBindVertexArray(VAOskybox);
+    glBindVertexArray(skyboxVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture->textureID);
     glDrawArrays(GL_TRIANGLES, 0, 36);
