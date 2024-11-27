@@ -39,10 +39,13 @@ def preprocess_img(input_path, output_path, width=1024, height=1024):
                 print("  - Convert 32-bit grayscale to 8-bit grayscale")
                 min_val = resized_img.getextrema()[0]
                 max_val = resized_img.getextrema()[1]
-                normalized = resized_img.point(
+                resized_img = resized_img.point(
                     lambda x: (x - min_val) / (max_val - min_val) * 255
                 )
-                resized_img = normalized.convert("L")
+            if original_mode in ["I", "L"]:
+                print("  - Convert grayscale to RGB image")
+                resized_img = resized_img.convert("RGB")
+
             resized_img.save(output_path, format="PNG")
             print(f"  - Converted image saved to: {output_path}")
             print(f"    - Original image size: {img.size}")
