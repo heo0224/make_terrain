@@ -12,6 +12,8 @@ std::unique_ptr<Context> Context::create() {
 
 bool Context::init() {
     camera = std::make_unique<Camera>();
+    sun = std::make_shared<DirectionalLight>(30.0f, 30.0f, glm::vec3(0.8f));
+    
     shader = std::make_unique<Shader>("../shaders/shader.vs", "../shaders/shader.fs");
     shader->use();
     shader->setInt("texture0", 0);
@@ -97,6 +99,7 @@ void Context::mouseButton(int button, int action, double x, double y) {
 
 void Context::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    sun->updateLightDir();
 
     glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)this->width / (float)this->height, 0.1f, 100.0f);
     glm::mat4 view = camera->getViewMatrix();
@@ -160,6 +163,16 @@ void Context::renderGUI() {
         // if (ImGui::ColorEdit4("clear color", glm::value_ptr(clearColor))) {
         //     glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
         // }
+        ImGui::Checkbox("lighting", &useLighting);
+        ImGui::SameLine();
+        ImGui::Checkbox("normal map", &useNormalMap);
+        ImGui::SameLine();
+        ImGui::Checkbox("shadow map", &useShadowMap);
+        ImGui::SameLine();
+        ImGui::Checkbox("PCF", &PCF);
+
+        ImGui::SliderFloat("sun azimuth", &sun->azimuth, 0.0f, 360.0f);
+        ImGui::SliderFloat("sun elevation", &sun->elevation, 5.0f, 90.0f);
         ImGui::SliderFloat("grass ground size", &grassGroundSize, 10.0f, 60.0f);
         ImGui::SliderFloat("water height", &waterHeight, -1.0f, 1.0f);
         ImGui::Separator();
