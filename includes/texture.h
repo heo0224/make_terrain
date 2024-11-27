@@ -21,4 +21,15 @@ public:
     CubemapTexture(std::vector<std::string> faces);
 };
 
+class DepthMapTexture 
+{
+public:
+	unsigned int ID;
+	unsigned int depthMapFBO;
+	int width;
+	int height;
+
+	DepthMapTexture(int shadow_width, int shadow_height);
+};
+
 #endif  // __TEXTURE_H__

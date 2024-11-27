@@ -5,6 +5,8 @@
 #include "camera.h"
 #include "shader.h"
 #include "texture.h"
+#include "light.h"
+#include "scene.h"
 
 class Context {
 public:
@@ -16,6 +18,7 @@ public:
     void reshape(int width, int height);
     void mouseMove(double x, double y);
     void mouseButton(int button, int action, double x, double y);
+    void moveSun(DirectionalLight* sun);
 
 private:
     Context() {};
@@ -45,7 +48,17 @@ private:
 
     unsigned int cubeVAO;
     unsigned int quadVAO;
-    unsigned int VAOskybox, VBOskybox;
+    unsigned int skyboxVAO;
+
+    bool useLighting = true;
+    bool useNormalMap = false;
+    bool useShadowMap = false;
+    bool PCF = false;
+
+    std::shared_ptr<DirectionalLight> sun;
+
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
 };
 
 #endif // __CONTEXT_H__
