@@ -2,7 +2,10 @@
 #define __SHADER_H__
 
 #include "common.h"
+#include "texture.h"
 #include <string>
+
+constexpr int MAX_TEXTURE_UNITS = 8;
 
 class Shader
 {
@@ -12,6 +15,8 @@ public:
         const char* tcsPath = nullptr, const char* tesPath = nullptr);
 
     void use();
+    void bindTexture(const std::string& name, const Texture* texture, int unit = 0);
+    void bindCubemapTexture(const std::string& name, const CubemapTexture* texture, int unit = 0);
     void setBool(const std::string& name, bool value) const;
     void setInt(const std::string& name, int value) const;
     void setFloat(const std::string& name, float value) const;
@@ -27,6 +32,8 @@ public:
 private:
     void checkCompileErrors(GLuint shader, std::string type);
     unsigned int loadShader(std::string path, unsigned int shaderType);
+
+    std::string bindedTextureNames[MAX_TEXTURE_UNITS] = { "" };
 };
 
 

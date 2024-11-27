@@ -15,26 +15,21 @@ bool Context::init() {
     sun = std::make_shared<DirectionalLight>(30.0f, 30.0f, glm::vec3(0.8f));
     
     shader = std::make_unique<Shader>("../shaders/shader.vs", "../shaders/shader.fs");
-    shader->use();
-    shader->setInt("texture0", 0);
     skyboxShader = std::make_unique<Shader>("../shaders/shader_skybox.vs", "../shaders/shader_skybox.fs");
-    skyboxShader->setInt("skyboxTexture1", 0);
     waterShader = std::make_unique<Shader>("../shaders/shader_water.vs", "../shaders/shader_water.fs");
-
     containerTexture = std::make_shared<Texture>("../assets/container.jpg");
     grassGroundtexture = std::make_shared<Texture>("../assets/grass_ground.jpg");
-
-    // skybox
-    std::vector<std::string> skyBoxFaces
-    {
+    skyboxTexture = std::make_shared<CubemapTexture>(
+        std::vector<std::string> {
         "../assets/skybox/right.tga",
-        "../assets/skybox/left.tga",
-        "../assets/skybox/top.tga",
-        "../assets/skybox/bottom.tga",
-        "../assets/skybox/front.tga",
-        "../assets/skybox/back.tga"
-    };
-    skyboxTexture = std::make_shared<CubemapTexture>(skyBoxFaces);
+            "../assets/skybox/left.tga",
+            "../assets/skybox/top.tga",
+            "../assets/skybox/bottom.tga",
+            "../assets/skybox/front.tga",
+            "../assets/skybox/back.tga"
+    }
+    );
+
 
     skyBoxVAO = generatePositionVAO(skyBoxPositions, sizeof(skyBoxPositions));
     cubeVAO = generatePositionTextureVAO(cubePositionsTextures, sizeof(cubePositionsTextures));
@@ -136,23 +131,20 @@ void Context::render() {
     shader->setVec4("clipPlane", glm::vec4(0.0f, 1.0f, 0.0f, -waterHeight));
     shader->use();
     // cube
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, containerTexture->ID);
     glBindVertexArray(cubeVAO);
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 1.0f, -2.0f));
     model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-    shader->setMat4("view", view);
+    shader->bindTexture("texture0", containerTexture.get());
     shader->setMat4("model", model);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     // ground
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, grassGroundtexture->ID);
     glBindVertexArray(quadVAO);
     model = glm::mat4(1.0f);
     model = glm::scale(model, glm::vec3(grassGroundSize));
     model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     shader->setMat4("model", model);
+    shader->bindTexture("texture0", grassGroundtexture.get());
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     // skybox
@@ -194,18 +186,14 @@ void Context::render() {
 
 
     // skybox
-    skyboxShader->use();
     glDepthFunc(GL_LEQUAL);
+    glBindVertexArray(skyBoxVAO);
     view = glm::mat4(glm::mat3(camera->getViewMatrix()));
+    skyboxShader->use();
     skyboxShader->setMat4("view", view);
     skyboxShader->setMat4("projection", projection);
-
-    glBindVertexArray(skyBoxVAO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture->textureID);
+    skyboxShader->bindCubemapTexture("skyboxTexture1", skyboxTexture.get());
     glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    glBindVertexArray(0);
     glDepthFunc(GL_LESS);
 }
 

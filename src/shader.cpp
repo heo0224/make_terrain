@@ -44,6 +44,46 @@ void Shader::use()
     glUseProgram(ID);
 }
 
+void Shader::bindTexture(const std::string& name, const Texture* texture, int unit)
+{
+    if (unit >= MAX_TEXTURE_UNITS) {
+        SPDLOG_ERROR("Texture unit is out of range: {}", unit);
+        return;
+    }
+
+    if (bindedTextureNames[unit] != name) {
+        GLint location = glGetUniformLocation(ID, name.c_str());
+        if (location == -1) {
+            SPDLOG_ERROR("Uniform not found: {}", name);
+            return;
+        }
+        glUniform1i(location, unit);
+        bindedTextureNames[unit] = name;
+    }
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_2D, texture->ID);
+}
+
+void Shader::bindCubemapTexture(const std::string& name, const CubemapTexture* texture, int unit)
+{
+    if (unit >= MAX_TEXTURE_UNITS) {
+        SPDLOG_ERROR("Texture unit is out of range: {}", unit);
+        return;
+    }
+
+    if (bindedTextureNames[unit] != name) {
+        GLint location = glGetUniformLocation(ID, name.c_str());
+        if (location == -1) {
+            SPDLOG_ERROR("Uniform not found: {}", name);
+            return;
+        }
+        glUniform1i(location, unit);
+        bindedTextureNames[unit] = name;
+    }
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture->textureID);
+}
+
 // Utility uniform functions
 void Shader::setBool(const std::string& name, bool value) const
 {
