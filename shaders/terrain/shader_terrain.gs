@@ -6,6 +6,8 @@ in vec3 teseColor[];
 in vec4 bottomPoint[];
 out vec3 geoColor;
 
+uniform int showGround;
+
 void addTriangle(vec4 v0, vec4 v1, vec4 v2, vec3 c0, vec3 c1, vec3 c2);
 void addQuad(vec4 v0, vec4 v1, vec4 v2, vec4 v3, vec3 c0, vec3 c1, vec3 c2, vec3 c3);
 
@@ -22,10 +24,12 @@ void main()
     vec4 b2 = bottomPoint[2];
 
     addTriangle(v0, v1, v2, c0, c1, c2);  // top triangle
-    addTriangle(b2, b1, b0, c2, c1, c0);  // bottom triangle (reverse winding order for correct face culling)
-    addQuad(v0, v1, b1, b0, c0, c1, c1, c0);  // side 1
-    addQuad(v1, v2, b2, b1, c1, c2, c2, c1);  // side 2
-    addQuad(v2, v0, b0, b2, c2, c0, c0, c2);  // side 3
+    if (showGround > 0.5) {
+        addTriangle(b2, b1, b0, c2, c1, c0);  // bottom triangle (reverse winding order for correct face culling)
+        addQuad(v0, v1, b1, b0, c0, c1, c1, c0);  // side 1
+        addQuad(v1, v2, b2, b1, c1, c2, c2, c1);  // side 2
+        addQuad(v2, v0, b0, b2, c2, c0, c0, c2);  // side 3
+    }
 }
 
 void addTriangle(vec4 v0, vec4 v1, vec4 v2, vec3 c0, vec3 c1, vec3 c2)
