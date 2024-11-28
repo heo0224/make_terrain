@@ -22,6 +22,7 @@ public:
     int maxTessLevel = 16;
     float minDistance = 1.0f;
     float maxDistance = 10.0f;
+    bool showGround = true;
 
 private:
     Terrain(Context* context) : context(context) {};
