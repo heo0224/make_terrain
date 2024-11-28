@@ -1,16 +1,16 @@
 #ifndef __GEOMETRY_PRIMITIVES_H__
 #define __GEOMETRY_PRIMITIVES_H__
 
-float quadPositionTextures[] = {
+const float quadPositionTextures[] = {
     // positions         // colors
     0.5f, 0.5f, 0.0f,  1.0f, 1.0f,   // top right
     0.5f, -0.5f, 0.0f,  1.0f, 0.0f,  // top left
     -0.5f,  -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
     -0.5f,  0.5f, 0.0f,  0.0f, 1.0f  // bottom right
 };
-unsigned int quadIndices[] = { 0,1,3,1,2,3 };
+const unsigned int quadIndices[] = { 0,1,3,1,2,3 };
 
-float cubePositionsTextures[] = {
+const float cubePositionsTextures[] = {
     //positions         // texture uvs
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -55,7 +55,7 @@ float cubePositionsTextures[] = {
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
-float skyBoxPositions[] = {
+const float skyBoxPositions[] = {
     // positions
     -1.0f,  1.0f, -1.0f,
     -1.0f, -1.0f, -1.0f,
