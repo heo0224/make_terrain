@@ -1,8 +1,13 @@
 #version 410
 layout(vertices = 4) out;
 
-in vec2 vertTexCoord[];
-out vec2 tescTexCoord[];
+in VS_OUT {
+	vec2 texCoord;
+} tesc_in[];
+
+out TESC_OUT {
+    vec2 texCoord;
+} tesc_out[];
 
 uniform mat4 model;
 uniform mat4 view;
@@ -16,7 +21,7 @@ void main()
 {
     // pass attributes through
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
-    tescTexCoord[gl_InvocationID] = vertTexCoord[gl_InvocationID];
+    tesc_out[gl_InvocationID].texCoord = tesc_in[gl_InvocationID].texCoord;
 
     // calculate tessellation levels
     if (gl_InvocationID == 0)
