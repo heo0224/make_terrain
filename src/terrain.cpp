@@ -21,7 +21,7 @@ void Terrain::init() {
     shader = std::make_unique<Shader>(
         "../shaders/terrain/shader_terrain.vs",
         "../shaders/terrain/shader_terrain.fs",
-        nullptr,
+        "../shaders/terrain/shader_terrain.gs",
         "../shaders/terrain/shader_terrain.tesc",
         "../shaders/terrain/shader_terrain.tese"
     );
