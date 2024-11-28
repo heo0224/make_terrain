@@ -1,28 +1,26 @@
-#pragma once
-#ifndef LIGHT_H
-#define LIGHT_H
+#ifndef __LIGHT_H__
+#define __LIGHT_H__
 
 #include "common.h"
 
+class Context;  // forward declaration
+
 class DirectionalLight {
 public:
-	float azimuth;
-	float elevation;
-	glm::vec3 lightDir; // direction of light. If elevation is 90, it would be (0,-1,0)
-	glm::vec3 lightColor; // this is I_d (I_s = I_d, I_a = 0.3 * I_d)
+    DirectionalLight(Context* context) : context(context) {};
+    void updateLightDir();
+    glm::mat4 getLightViewMatrix();
+    glm::mat4 getLightProjectionMatrix();
+    glm::mat4 getLightSpaceMatrix();
 
-	DirectionalLight(float azimuth, float elevation, glm::vec3 lightColor);
-
-	DirectionalLight(glm::vec3 lightDir, glm::vec3 lightColor);
-
-	glm::mat4 getViewMatrix(glm::vec3 cameraPosition);
-
-	glm::mat4 getProjectionMatrix();
-
-	void updateLightDir();
-
-	void processKeyboard(float xoffset, float yoffset);
+    float azimuth = 30.0f;
+    float elevation = 30.0f;
+    const float lightDistance = 30.0f;
+    float frustumSize = 1000.0f;
+    glm::vec3 color = glm::vec3(1.0f);
+    glm::vec3 direction = glm::vec3(0.0f, 0.0f, 1.0f);
+private:
+    Context* context;
 };
 
-
-#endif
+#endif // __LIGHT_H__

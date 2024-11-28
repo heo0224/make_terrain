@@ -12,6 +12,7 @@ std::unique_ptr<Context> Context::create() {
 
 bool Context::init() {
     camera = std::make_unique<Camera>();
+    light = std::make_unique<DirectionalLight>(this);
     skybox = std::make_unique<Skybox>(this);
     terrain = Terrain::createWithTessellation(this);
 

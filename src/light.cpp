@@ -1,44 +1,29 @@
+#include "common.h"
+#include "context.h"
 #include "light.h"
-#include "utils.h"
 
-DirectionalLight::DirectionalLight(float azimuth, float elevation, glm::vec3 lightColor) {
-    this->azimuth = azimuth;
-    this->elevation = elevation;
-    updateLightDir();
-    this->lightColor = lightColor;
+glm::mat4 DirectionalLight::getLightViewMatrix() {
+    glm::vec3 terrainCenter = glm::vec3(0.0f, context->terrain->heightOffset, 0.0f);  // center of the scene
+    glm::vec3 lightPos = terrainCenter - this->direction * lightDistance;
+    return glm::lookAt(lightPos, terrainCenter, glm::vec3(0, 1, 0));
 }
 
-DirectionalLight::DirectionalLight(glm::vec3 lightDir, glm::vec3 lightColor) {
-    this->lightDir = lightDir;
-    this->lightColor = lightColor;
+glm::mat4 DirectionalLight::getLightProjectionMatrix() {
+    return glm::ortho(-frustumSize, frustumSize, -frustumSize, frustumSize, 0.1f, 100000.0f);
 }
 
-glm::mat4 DirectionalLight::getViewMatrix(glm::vec3 cameraPosition) {
-    // directional light has no light position. Assume fake light position depending on camera position.
-    float lightDistance = 15.0f;
-    glm::vec3 lightPos = cameraPosition - this->lightDir * lightDistance;
-    return glm::lookAt(lightPos, cameraPosition, glm::vec3(0, 1, 0));
-}
-
-glm::mat4 DirectionalLight::getProjectionMatrix() {
-    // For simplicity, just use static projection matrix. (Actually we have to be more accurate with considering camera's frustum)
-    return glm::ortho(-15.0f, 15.0f, -15.0f, 15.0f, 0.1f, 50.0f);
+glm::mat4 DirectionalLight::getLightSpaceMatrix() {
+    glm::mat4 lightProjection = getLightProjectionMatrix();
+    glm::mat4 lightView = getLightViewMatrix();
+    return lightProjection * lightView;
 }
 
 void DirectionalLight::updateLightDir() {
-    this->lightDir = -glm::vec3(
-        cos(glm::radians(azimuth)) * cos(glm::radians(elevation)),
-        sin(glm::radians(elevation)),
-        sin(glm::radians(azimuth)) * cos(glm::radians(elevation))
-        );
-}
+    float azimuthRad = glm::radians(azimuth);
+    float elevationRad = glm::radians(elevation);
 
-// Processes input received from a mouse input system. Expects the offset value in both the x(azimuth) and y(elevation) direction.
-void DirectionalLight::processKeyboard(float xoffset, float yoffset)
-{
-    // set elevation between 15 to 80 (degree)!
-    this->azimuth += xoffset;
-    this->elevation += yoffset;
-    elevation = clamp(elevation, 15, 80);
-    updateLightDir();
+    float x = cos(azimuthRad) * cos(elevationRad);
+    float y = sin(elevationRad);
+    float z = -sin(azimuthRad) * cos(elevationRad);
+    direction = glm::vec3(-x, -y, -z);
 }
