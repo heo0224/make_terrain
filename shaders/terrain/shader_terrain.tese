@@ -2,9 +2,14 @@
 // layout( quads, equal_spacing, ccw) in;
 layout (quads, fractional_odd_spacing, ccw) in;
 
-in vec2 tescTexCoord[];
-out vec3 teseColor;
-out vec4 bottomPoint;
+in TESC_OUT {
+    vec2 texCoord;
+} tese_in[];
+
+out TESE_OUT {
+    vec3 color;
+    vec4 bottomPoint;
+} tese_out;
 
 uniform sampler2D heightMap;
 uniform sampler2D diffuseMap;
@@ -21,10 +26,10 @@ void main()
     float v = gl_TessCoord.y;
 
     // retrieve control point texture coordinates
-    vec2 t00 = tescTexCoord[0];
-    vec2 t01 = tescTexCoord[1];
-    vec2 t10 = tescTexCoord[2];
-    vec2 t11 = tescTexCoord[3];
+    vec2 t00 = tese_in[0].texCoord;
+    vec2 t01 = tese_in[1].texCoord;
+    vec2 t10 = tese_in[2].texCoord;
+    vec2 t11 = tese_in[3].texCoord;
 
     // bilinearly interpolate texture coordinate across patch
     vec2 t0 = (t01 - t00) * u + t00;
@@ -58,6 +63,6 @@ void main()
     // ----------------------------------------------------------------------
     // output patch point position in clip space
     gl_Position = projection * view * model * tp;
-    teseColor = texture(diffuseMap, texCoord).rgb;
-    bottomPoint = projection * view * model * bp;
+    tese_out.color = texture(diffuseMap, texCoord).rgb;
+    tese_out.bottomPoint = projection * view * model * bp;
 }
