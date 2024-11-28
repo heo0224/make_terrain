@@ -30,7 +30,7 @@ bool Context::init() {
     }
     );
 
-
+    terrain = Terrain::createWithTessellation(this);
     skyBoxVAO = generatePositionVAO(skyBoxPositions, sizeof(skyBoxPositions));
     cubeVAO = generatePositionTextureVAO(cubePositionsTextures, sizeof(cubePositionsTextures));
     quadVAO = generatePositionTextureVAOWithEBO(quadPositionTextures, sizeof(quadPositionTextures), quadIndices, sizeof(quadIndices));
@@ -121,74 +121,13 @@ void Context::render() {
     camera->position.y -= distance;
     camera->invertPitch();
 
-    glm::mat4 projection = getProjectionMatrix();
-    glm::mat4 view = getViewMatrix();
-    glm::mat4 model = glm::mat4(1.0f);
-    shader->use();
-    shader->setMat4("projection", projection);
-    shader->setMat4("view", view);
-    shader->setMat4("model", model);
-    shader->setVec4("clipPlane", glm::vec4(0.0f, 1.0f, 0.0f, -waterHeight));
-    shader->use();
-    // cube
-    glBindVertexArray(cubeVAO);
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 1.0f, -2.0f));
-    model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-    shader->bindTexture("texture0", containerTexture.get());
-    shader->setMat4("model", model);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    // ground
-    glBindVertexArray(quadVAO);
-    model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(grassGroundSize));
-    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    shader->setMat4("model", model);
-    shader->bindTexture("texture0", grassGroundtexture.get());
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    // skybox
-    skyboxshader->use();
-    glDepthFunc(GL_LEQUAL);
-    glm::mat4 cubeview = glm::mat4(glm::mat3(view));
-    skyboxshader->setMat4("view", cubeview);
-    skyboxshader->setMat4("projection", projection);
-
-    glBindVertexArray(skyboxVAO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture->textureID);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    glBindVertexArray(0);
-    glDepthFunc(GL_LESS);
-
-    
-    glDisable(GL_CLIP_DISTANCE0);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //water
-    camera->position.y += distance;
-    camera->invertPitch();
-    view = camera->getViewMatrix();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-    glBindVertexArray(quadVAO);
-    model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(waterSize, 1.0f, waterSize));
-    model = glm::translate(model, glm::vec3(0.0f, waterHeight, 0.0f));
-    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, waterHeight));
-    waterShader->use();
-    waterShader->setMat4("projection", projection);
-    waterShader->setMat4("view", view);
-    waterShader->setMat4("model", model);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
+    terrain->render();
 
     // skybox
     glDepthFunc(GL_LEQUAL);
     glBindVertexArray(skyBoxVAO);
-    view = glm::mat4(glm::mat3(camera->getViewMatrix()));
+    glm::mat4 view = glm::mat4(glm::mat3(camera->getViewMatrix()));
+    glm::mat4 projection = getProjectionMatrix();
     skyboxShader->use();
     skyboxShader->setMat4("view", view);
     skyboxShader->setMat4("projection", projection);
@@ -199,22 +138,32 @@ void Context::render() {
 
 void Context::renderGUI() {
     if (ImGui::Begin("UI Window Example")) {
-        ImGui::Text("Rendering Mode");
-        if (ImGui::RadioButton("Fill", !wireFrameMode)) {
-            wireFrameMode = false;
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
-        ImGui::SameLine();
-        if (ImGui::RadioButton("Wireframe", wireFrameMode)) {
-            wireFrameMode = true;
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        if (ImGui::TreeNode("Rendering Mode")) {
+            if (ImGui::RadioButton("Fill", !wireFrameMode)) {
+                wireFrameMode = false;
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            }
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Wireframe", wireFrameMode)) {
+                wireFrameMode = true;
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            }
+            ImGui::TreePop();
         }
         ImGui::Separator();
-        ImGui::SliderFloat("grass ground size", &grassGroundSize, 10.0f, 60.0f);
-        ImGui::SliderFloat("water height", &waterHeight, -2.0f, 2.0f);
-        ImGui::Separator();
-        if (ImGui::Button("reset camera")) {
-            camera->reset();
+
+        if (ImGui::CollapsingHeader("Terrain")) {
+            ImGui::SliderFloat("height offset", &terrain->heightOffset, -100.0f, 100.0f);
+            ImGui::SliderFloat("height scale", &terrain->heightScale, 0.0f, 100.0f);
+            ImGui::SliderFloat("horizontal scale", &terrain->horizontalScale, 0.01f, 0.1f);
+            ImGui::SliderInt("min tess level", &terrain->minTessLevel, 2, terrain->maxTessLevel - 1);
+            ImGui::SliderInt("max tess level", &terrain->maxTessLevel, terrain->minTessLevel + 1, 64);
+            ImGui::SliderFloat("min distance", &terrain->minDistance, 1.0f, terrain->maxDistance);
+            ImGui::SliderFloat("max distance", &terrain->maxDistance, terrain->minDistance, 100.0f);
+        }
+
+        if (ImGui::CollapsingHeader("Water")) {
+            ImGui::SliderFloat("water height", &waterHeight, -1.0f, 1.0f);
         }
     }
     ImGui::End();
