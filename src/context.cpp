@@ -91,8 +91,8 @@ void Context::mouseButton(int button, int action, double x, double y) {
 void Context::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)this->width / (float)this->height, 0.1f, 100.0f);
-    glm::mat4 view = camera->getViewMatrix();
+    glm::mat4 projection = getProjectionMatrix();
+    glm::mat4 view = getViewMatrix();
     glm::mat4 model = glm::mat4(1.0f);
     shader->use();
     shader->setMat4("projection", projection);
