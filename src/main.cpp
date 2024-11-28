@@ -18,8 +18,8 @@ int main(int argc, const char** argv) {
         SPDLOG_ERROR("failed to initialize glfw: {}", description);
         return -1;
     }
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     SPDLOG_INFO("Create glfw window");
@@ -62,6 +62,9 @@ int main(int argc, const char** argv) {
     glfwSetCursorPosCallback(window, OnCursorPos);
     glfwSetMouseButtonCallback(window, OnMouseButton);
     glfwSetScrollCallback(window, OnScroll);
+
+    // use quad for each patch
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
 
     SPDLOG_INFO("Start main loop");
     while (!glfwWindowShouldClose(window)) {
