@@ -5,8 +5,7 @@
 #include "camera.h"
 #include "shader.h"
 #include "texture.h"
-#include "light.h"
-#include "scene.h"
+#include "terrain.h"
 
 class Context {
 public:
@@ -30,6 +29,7 @@ private:
     std::unique_ptr<Shader> shader;
     std::unique_ptr<Shader> skyboxShader;
     std::unique_ptr<Shader> waterShader;
+    std::unique_ptr<Terrain> terrain;
     std::shared_ptr<Texture> containerTexture;
     std::shared_ptr<Texture> grassGroundtexture;
     std::shared_ptr<CubemapTexture> skyboxTexture;
@@ -67,7 +67,7 @@ inline glm::mat4 Context::getViewMatrix() {
 }
 
 inline glm::mat4 Context::getProjectionMatrix() {
-    return glm::perspective(glm::radians(camera->zoom), (float)this->width / (float)this->height, 0.1f, 100.0f);
+    return glm::perspective(glm::radians(camera->zoom), (float)this->width / (float)this->height, 0.1f, 100000.0f);
 }
 
 #endif // __CONTEXT_H__
