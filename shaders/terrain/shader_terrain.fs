@@ -1,9 +1,12 @@
 #version 410 core
 
-in vec3 geoColor;
+in GS_OUT {
+    vec3 color;
+} fs_in;
+
 out vec4 fragColor;
 
 void main()
 {
-    fragColor = vec4(geoColor, 1.0);
+    fragColor = vec4(fs_in.color, 1.0);
 }

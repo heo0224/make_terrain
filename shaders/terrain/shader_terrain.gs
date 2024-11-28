@@ -2,9 +2,14 @@
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 24) out;
 
-in vec3 teseColor[];
-in vec4 bottomPoint[];
-out vec3 geoColor;
+in TESE_OUT {
+    vec3 color;
+    vec4 bottomPoint;
+} gs_in[];
+
+out GS_OUT {
+    vec3 color;
+} gs_out;
 
 uniform bool showGround;
 
@@ -16,12 +21,12 @@ void main()
     vec4 v0 = gl_in[0].gl_Position;
     vec4 v1 = gl_in[1].gl_Position;
     vec4 v2 = gl_in[2].gl_Position;
-    vec3 c0 = teseColor[0];
-    vec3 c1 = teseColor[1];
-    vec3 c2 = teseColor[2];
-    vec4 b0 = bottomPoint[0];
-    vec4 b1 = bottomPoint[1];
-    vec4 b2 = bottomPoint[2];
+    vec3 c0 = gs_in[0].color;
+    vec3 c1 = gs_in[1].color;
+    vec3 c2 = gs_in[2].color;
+    vec4 b0 = gs_in[0].bottomPoint;
+    vec4 b1 = gs_in[1].bottomPoint;
+    vec4 b2 = gs_in[2].bottomPoint;
 
     addTriangle(v0, v1, v2, c0, c1, c2);  // top triangle
     if (showGround) {
@@ -35,15 +40,15 @@ void main()
 void addTriangle(vec4 v0, vec4 v1, vec4 v2, vec3 c0, vec3 c1, vec3 c2)
 {
     gl_Position = v0;
-    geoColor = c0;
+    gs_out.color = c0;
     EmitVertex();
 
     gl_Position = v1;
-    geoColor = c1;
+    gs_out.color = c1;
     EmitVertex();
 
     gl_Position = v2;
-    geoColor = c2;
+    gs_out.color = c2;
     EmitVertex();
 
     EndPrimitive();
@@ -53,30 +58,30 @@ void addQuad(vec4 v0, vec4 v1, vec4 v2, vec4 v3, vec3 c0, vec3 c1, vec3 c2, vec3
 {
     // first triangle
     gl_Position = v0;
-    geoColor = c0;
+    gs_out.color = c0;
     EmitVertex();
 
     gl_Position = v1;
-    geoColor = c1;
+    gs_out.color = c1;
     EmitVertex();
 
     gl_Position = v2;
-    geoColor = c2;
+    gs_out.color = c2;
     EmitVertex();
 
     EndPrimitive();
 
     // second triangle
     gl_Position = v2;
-    geoColor = c2;
+    gs_out.color = c2;
     EmitVertex();
 
     gl_Position = v3;
-    geoColor = c3;
+    gs_out.color = c3;
     EmitVertex();
 
     gl_Position = v0;
-    geoColor = c0;
+    gs_out.color = c0;
     EmitVertex();
 
     EndPrimitive();
