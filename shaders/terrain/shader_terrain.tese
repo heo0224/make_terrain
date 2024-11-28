@@ -4,6 +4,7 @@ layout (quads, fractional_odd_spacing, ccw) in;
 
 in vec2 tescTexCoord[];
 out vec3 teseColor;
+out vec4 bottomPoint;
 
 uniform sampler2D heightMap;
 uniform sampler2D diffuseMap;
@@ -13,7 +14,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-void main( )
+void main()
 {
     // get patch coordinate
     float u = gl_TessCoord.x;
@@ -51,10 +52,12 @@ void main( )
     vec4 p = (p1 - p0) * v + p0;
 
     // displace point along normal
-    p += normal * height;
+    vec4 tp = p + normal * height;
+    vec4 bp = p + normal * heightOffset;
 
     // ----------------------------------------------------------------------
     // output patch point position in clip space
-    gl_Position = projection * view * model * p;
+    gl_Position = projection * view * model * tp;
     teseColor = texture(diffuseMap, texCoord).rgb;
+    bottomPoint = projection * view * model * bp;
 }
