@@ -94,6 +94,7 @@ void Context::renderGUI() {
         ImGui::Separator();
 
         if (ImGui::CollapsingHeader("Terrain")) {
+            ImGui::Checkbox("show ground", &terrain->showGround);
             ImGui::SliderFloat("height offset", &terrain->heightOffset, -100.0f, 100.0f);
             ImGui::SliderFloat("height scale", &terrain->heightScale, 0.0f, 100.0f);
             ImGui::SliderFloat("horizontal scale", &terrain->horizontalScale, 0.01f, 0.1f);
