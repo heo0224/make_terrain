@@ -121,8 +121,8 @@ void Context::render() {
     camera->position.y -= distance;
     camera->invertPitch();
 
-    glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)this->width / (float)this->height, 0.1f, 100.0f);
-    glm::mat4 view = camera->getViewMatrix();
+    glm::mat4 projection = getProjectionMatrix();
+    glm::mat4 view = getViewMatrix();
     glm::mat4 model = glm::mat4(1.0f);
     shader->use();
     shader->setMat4("projection", projection);
