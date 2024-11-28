@@ -6,6 +6,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "terrain.h"
+#include "skybox.h"
 
 class Context {
 public:
@@ -26,13 +27,8 @@ private:
     bool init();
 
     std::unique_ptr<Camera> camera;
-    std::unique_ptr<Shader> shader;
-    std::unique_ptr<Shader> skyboxShader;
-    std::unique_ptr<Shader> waterShader;
     std::unique_ptr<Terrain> terrain;
-    std::shared_ptr<Texture> containerTexture;
-    std::shared_ptr<Texture> grassGroundtexture;
-    std::shared_ptr<CubemapTexture> skyboxTexture;
+    std::unique_ptr<Skybox> skybox;
 
     int width = WINDOW_WIDTH;
     int height = WINDOW_HEIGHT;
@@ -41,17 +37,7 @@ private:
     float lastY = WINDOW_HEIGHT / 2.0f;
     float deltaTime = 0.0f;
     float lastTime = 0.0f;
-
-    glm::vec4 clearColor = glm::vec4(0.2f, 0.3f, 0.3f, 1.0f);
-
-    float grassGroundSize = 20.0f;
-    float waterSize = 20.0f;
-    float waterHeight = 0.0f;
     bool wireFrameMode = false;
-
-    unsigned int cubeVAO;
-    unsigned int quadVAO;
-    unsigned int skyBoxVAO;
 };
 
 inline glm::mat4 Context::getModelMatrix(glm::vec3 transl, glm::vec3 axis, float angleInDeg, glm::vec3 scale) {
