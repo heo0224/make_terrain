@@ -7,6 +7,7 @@
 #include "texture.h"
 #include "terrain.h"
 #include "skybox.h"
+#include "light.h"
 
 class Context {
 public:
@@ -22,11 +23,14 @@ public:
     glm::mat4 getViewMatrix();
     glm::mat4 getProjectionMatrix();
 
+    friend class DirectionalLight;
+
 private:
     Context() {};
     bool init();
 
     std::unique_ptr<Camera> camera;
+    std::unique_ptr<DirectionalLight> light;
     std::unique_ptr<Terrain> terrain;
     std::unique_ptr<Skybox> skybox;
 
