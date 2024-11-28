@@ -93,6 +93,7 @@ void Terrain::render() {
     shader->setInt("maxTessLevel", maxTessLevel);
     shader->setFloat("minDistance", minDistance);
     shader->setFloat("maxDistance", maxDistance);
+    shader->setBool("showGround", showGround);
     glBindVertexArray(VAO);
     glDrawArrays(GL_PATCHES, 0, 4 * numStrips * numStrips);
 }
