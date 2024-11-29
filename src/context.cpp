@@ -118,6 +118,16 @@ void Context::renderGUI() {
                 ImGui::TreePop();
             }
 
+            if (ImGui::TreeNode("Lighting")) {
+                if (ImGui::SliderFloat("azimuth", &light->azimuth, 0.0f, 360.0f))
+                    light->updateLightDir();
+                if (ImGui::SliderFloat("elevation", &light->elevation, 0.0f, 90.0f))
+                    light->updateLightDir();
+                ImGui::SliderFloat("frustum size", &light->frustumSize, 500.0f, 10000.0f);
+                ImGui::SliderFloat("light distance", &light->lightDistance, 10.0f, 500.0f);
+                ImGui::TreePop();
+            }
+
             if (ImGui::TreeNode("Shadow Mapping")) {
                 ImGui::Checkbox("use shadow", &useShadow);
                 ImGui::SameLine();
