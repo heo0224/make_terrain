@@ -15,6 +15,7 @@ bool Context::init() {
     light = std::make_unique<DirectionalLight>(this);
     skybox = std::make_unique<Skybox>(this);
     terrain = Terrain::createWithTessellation(this);
+    depthMap = Framebuffer::create(1024, 1024, AttachmentType::DEPTH);
 
     return true;
 }
@@ -70,35 +71,64 @@ void Context::mouseButton(int button, int action, double x, double y) {
 }
 
 void Context::render() {
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    sun->updateLightDir();
-    
-    glEnable(GL_CLIP_DISTANCE0);
-    // flip camera
-    float distance = 2 * (camera->position.y - waterHeight);
-    camera->position.y -= distance;
-    camera->invertPitch();
+    _renderToDepthMap();
+    _renderToScreen();
 
-    terrain->render();
+    // render skybox at last separately
     skybox->render();
+}
+
+void Context::_renderToDepthMap() {
+    if (!useShadow)
+        return;
+
+    glViewport(0, 0, depthMap->width, depthMap->height);
+    depthMap->bind();
+    renderToDepthMap = true;
+    glClear(GL_DEPTH_BUFFER_BIT);
+    _drawScene();
+    depthMap->unbind();
+    renderToDepthMap = false;
+}
+
+void Context::_renderToScreen() {
+    assert(!renderToDepthMap);
+    glViewport(0, 0, width, height);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _drawScene();
+}
+
+void Context::_drawScene() {
+    terrain->render();
 }
 
 void Context::renderGUI() {
     if (ImGui::Begin("UI Window Example")) {
-        if (ImGui::TreeNode("Rendering Mode")) {
-            if (ImGui::RadioButton("Fill", !wireFrameMode)) {
-                wireFrameMode = false;
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        if (ImGui::CollapsingHeader("Rendering")) {
+            if (ImGui::TreeNode("Rendering Mode")) {
+                if (ImGui::RadioButton("Fill", !wireFrameMode)) {
+                    wireFrameMode = false;
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                }
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Wireframe", wireFrameMode)) {
+                    wireFrameMode = true;
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                }
+                ImGui::TreePop();
             }
-            ImGui::SameLine();
-            if (ImGui::RadioButton("Wireframe", wireFrameMode)) {
-                wireFrameMode = true;
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+            if (ImGui::TreeNode("Shadow Mapping")) {
+                ImGui::Checkbox("use shadow", &useShadow);
+                ImGui::SameLine();
+                ImGui::Checkbox("use PCF", &usePCF);
+                ImGui::SliderFloat("min shadow bias", &minShadowBias, 0.001f, maxShadowBias - 0.001f);
+                ImGui::SliderFloat("max shadow bias", &maxShadowBias, minShadowBias + 0.001f, 0.1f);
+                ImGui::SliderInt("num PCF samples", &numPCFSamples, 1, 16);
+                ImGui::SliderFloat("PCF spreadness", &PCFSpreadness, 1.0 / 5000.0f, 1.0 / 500.0f);
+                ImGui::TreePop();
             }
-            ImGui::TreePop();
         }
-        ImGui::Separator();
 
         if (ImGui::CollapsingHeader("Terrain")) {
             ImGui::Checkbox("show ground", &terrain->showGround);
