@@ -2,6 +2,10 @@
 #include "context.h"
 #include "light.h"
 
+DirectionalLight::DirectionalLight(Context* context) : context(context) {
+    updateLightDir();
+};
+
 glm::mat4 DirectionalLight::getLightViewMatrix() {
     glm::vec3 terrainCenter = glm::vec3(0.0f, context->terrain->heightOffset, 0.0f);  // center of the scene
     glm::vec3 lightPos = terrainCenter - this->direction * lightDistance;
