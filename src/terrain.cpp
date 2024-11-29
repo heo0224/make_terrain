@@ -82,11 +82,13 @@ void Terrain::render() {
     glm::mat4 projection = context->getProjectionMatrix();
 
     shader->use();
-    shader->bindTexture("heightMap", heightMap.get(), 0);
-    shader->bindTexture("diffuseMap", diffuseMap.get(), 1);
     shader->setMat4("model", model);
     shader->setMat4("view", view);
     shader->setMat4("projection", projection);
+
+    // terrain
+    shader->bindTexture("heightMap", heightMap.get(), 0);
+    shader->bindTexture("diffuseMap", diffuseMap.get(), 1);
     shader->setFloat("heightScale", heightScale);
     shader->setFloat("heightOffset", heightOffset);
     shader->setInt("minTessLevel", minTessLevel);
@@ -94,6 +96,21 @@ void Terrain::render() {
     shader->setFloat("minDistance", minDistance);
     shader->setFloat("maxDistance", maxDistance);
     shader->setBool("showGround", showGround);
+
+    // light
+    shader->setVec3("lightDir", context->light->direction);
+    shader->setMat4("lightSpaceMatrix", context->light->getLightSpaceMatrix());
+
+    // shadow
+    shader->bindTexture("depthMap", context->depthMap.get(), 2);
+    shader->setBool("renderToDepthMap", context->renderToDepthMap);
+    shader->setBool("useShadow", context->useShadow);
+    shader->setBool("usePCF", context->usePCF);
+    shader->setFloat("minShadowBias", context->minShadowBias);
+    shader->setFloat("maxShadowBias", context->maxShadowBias);
+    shader->setInt("numPCFSamples", context->numPCFSamples);
+    shader->setFloat("PCFSpreadness", context->PCFSpreadness);
+
     glBindVertexArray(VAO);
     glDrawArrays(GL_PATCHES, 0, 4 * numStrips * numStrips);
 }
