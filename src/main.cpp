@@ -63,8 +63,10 @@ int main(int argc, const char** argv) {
     glfwSetMouseButtonCallback(window, OnMouseButton);
     glfwSetScrollCallback(window, OnScroll);
 
-    // use quad for each patch
-    glPatchParameteri(GL_PATCH_VERTICES, 4);
+    glPatchParameteri(GL_PATCH_VERTICES, 4);  // use quad patches
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glCullFace(GL_BACK);
 
     SPDLOG_INFO("Start main loop");
     while (!glfwWindowShouldClose(window)) {
