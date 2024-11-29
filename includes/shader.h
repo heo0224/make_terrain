@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "texture.h"
+#include "framebuffer.h"
 #include <string>
 
 constexpr int MAX_TEXTURE_UNITS = 8;
@@ -16,6 +17,7 @@ public:
 
     void use();
     void bindTexture(const std::string& name, const Texture* texture, int unit = 0);
+    void bindTexture(const std::string& name, const Framebuffer* framebuffer, int unit = 0);
     void bindCubemapTexture(const std::string& name, const CubemapTexture* texture, int unit = 0);
     void setBool(const std::string& name, bool value) const;
     void setInt(const std::string& name, int value) const;
