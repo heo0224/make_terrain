@@ -16,7 +16,6 @@ bool Context::init() {
     skybox = std::make_unique<Skybox>(this);
     terrain = Terrain::createWithTessellation(this);
 
-    glEnable(GL_DEPTH_TEST);
     return true;
 }
 
