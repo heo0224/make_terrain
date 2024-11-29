@@ -8,11 +8,15 @@
 #include "terrain.h"
 #include "skybox.h"
 #include "light.h"
+#include "framebuffer.h"
 
 class Context {
 public:
     static std::unique_ptr<Context> create();
     void render();
+    void _renderToDepthMap();
+    void _renderToScreen();
+    void _drawScene();
     void renderGUI();
     void updateDeltaTime();
     void processInput(GLFWwindow* window);
@@ -24,6 +28,7 @@ public:
     glm::mat4 getProjectionMatrix();
 
     friend class DirectionalLight;
+    friend class Terrain;
 
 private:
     Context() {};
@@ -33,6 +38,7 @@ private:
     std::unique_ptr<DirectionalLight> light;
     std::unique_ptr<Terrain> terrain;
     std::unique_ptr<Skybox> skybox;
+    std::unique_ptr<Framebuffer> depthMap;
 
     int width = WINDOW_WIDTH;
     int height = WINDOW_HEIGHT;
@@ -42,6 +48,15 @@ private:
     float deltaTime = 0.0f;
     float lastTime = 0.0f;
     bool wireFrameMode = false;
+
+    // shadow mapping
+    bool renderToDepthMap = false;
+    bool useShadow = false;
+    bool usePCF = false;
+    float minShadowBias = 0.005f;
+    float maxShadowBias = 0.01f;
+    int numPCFSamples = 8;
+    float PCFSpreadness = 1.0f / 3000.0f;
 };
 
 inline glm::mat4 Context::getModelMatrix(glm::vec3 transl, glm::vec3 axis, float angleInDeg, glm::vec3 scale) {
