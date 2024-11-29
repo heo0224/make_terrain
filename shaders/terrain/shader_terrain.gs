@@ -13,76 +13,53 @@ out GS_OUT {
 
 uniform bool showGround;
 
-void addTriangle(vec4 v0, vec4 v1, vec4 v2, vec3 c0, vec3 c1, vec3 c2);
-void addQuad(vec4 v0, vec4 v1, vec4 v2, vec4 v3, vec3 c0, vec3 c1, vec3 c2, vec3 c3);
+void addTriangle(vec4 v0, vec4 v1, vec4 v2, int idx0, int idx1, int idx2);
+void addQuad(vec4 v0, vec4 v1, vec4 v2, vec4 v3, int idx0, int idx1, int idx2, int idx3);
+void emitVertexWithAttributes(vec4 pos, int idx);
 
 void main()
 {
     vec4 v0 = gl_in[0].gl_Position;
     vec4 v1 = gl_in[1].gl_Position;
     vec4 v2 = gl_in[2].gl_Position;
-    vec3 c0 = gs_in[0].color;
-    vec3 c1 = gs_in[1].color;
-    vec3 c2 = gs_in[2].color;
     vec4 b0 = gs_in[0].bottomPoint;
     vec4 b1 = gs_in[1].bottomPoint;
     vec4 b2 = gs_in[2].bottomPoint;
 
-    addTriangle(v0, v1, v2, c0, c1, c2);  // top triangle
+    addTriangle(v0, v1, v2, 0, 1, 2);  // top triangle
     if (showGround) {
-        addTriangle(b2, b1, b0, c2, c1, c0);  // bottom triangle (reverse winding order for correct face culling)
-        addQuad(v0, v1, b1, b0, c0, c1, c1, c0);  // side 1
-        addQuad(v1, v2, b2, b1, c1, c2, c2, c1);  // side 2
-        addQuad(v2, v0, b0, b2, c2, c0, c0, c2);  // side 3
+        addTriangle(b2, b1, b0, 2, 1, 0);  // bottom triangle (reverse winding order for correct face culling)
+        addQuad(v0, v1, b1, b0, 0, 1, 1, 0);  // side 1
+        addQuad(v1, v2, b2, b1, 1, 2, 2, 1);  // side 2
+        addQuad(v2, v0, b0, b2, 2, 0, 0, 2);  // side 3
     }
 }
 
-void addTriangle(vec4 v0, vec4 v1, vec4 v2, vec3 c0, vec3 c1, vec3 c2)
+void addTriangle(vec4 v0, vec4 v1, vec4 v2, int idx0, int idx1, int idx2)
 {
-    gl_Position = v0;
-    gs_out.color = c0;
-    EmitVertex();
-
-    gl_Position = v1;
-    gs_out.color = c1;
-    EmitVertex();
-
-    gl_Position = v2;
-    gs_out.color = c2;
-    EmitVertex();
-
+    emitVertexWithAttributes(v0, idx0);
+    emitVertexWithAttributes(v1, idx1);
+    emitVertexWithAttributes(v2, idx2);
     EndPrimitive();
 }
 
-void addQuad(vec4 v0, vec4 v1, vec4 v2, vec4 v3, vec3 c0, vec3 c1, vec3 c2, vec3 c3)
+void addQuad(vec4 v0, vec4 v1, vec4 v2, vec4 v3, int idx0, int idx1, int idx2, int idx3)
 {
     // first triangle
-    gl_Position = v0;
-    gs_out.color = c0;
-    EmitVertex();
-
-    gl_Position = v1;
-    gs_out.color = c1;
-    EmitVertex();
-
-    gl_Position = v2;
-    gs_out.color = c2;
-    EmitVertex();
-
+    emitVertexWithAttributes(v0, idx0);
+    emitVertexWithAttributes(v1, idx1);
+    emitVertexWithAttributes(v2, idx2);
     EndPrimitive();
 
     // second triangle
-    gl_Position = v2;
-    gs_out.color = c2;
-    EmitVertex();
-
-    gl_Position = v3;
-    gs_out.color = c3;
-    EmitVertex();
-
-    gl_Position = v0;
-    gs_out.color = c0;
-    EmitVertex();
-
+    emitVertexWithAttributes(v2, idx2);
+    emitVertexWithAttributes(v3, idx3);
+    emitVertexWithAttributes(v0, idx0);
     EndPrimitive();
+}
+
+void emitVertexWithAttributes(vec4 pos, int idx) {
+    gl_Position = pos;
+    gs_out.color = gs_in[idx].color;
+    EmitVertex();
 }
