@@ -16,6 +16,12 @@ bool Context::init() {
     skybox = std::make_unique<Skybox>(this);
     terrain = Terrain::createWithTessellation(this);
     depthMap = Framebuffer::create(1024, 1024, AttachmentType::DEPTH);
+    sceneBuffer = Framebuffer::create(width, height, AttachmentType::COLOR);
+    quadVAO = generatePositionTextureVAOWithEBO(quadPositionTextures, sizeof(quadPositionTextures), quadIndices, sizeof(quadIndices));
+    depthQuadShader = std::make_unique<Shader>(
+        "../shaders/debug/shader_depth_quad.vs",
+        "../shaders/debug/shader_depth_quad.fs"
+    );
 
     return true;
 }
@@ -150,6 +156,40 @@ void Context::renderGUI() {
             ImGui::SliderFloat("min distance", &terrain->minDistance, 1.0f, terrain->maxDistance);
             ImGui::SliderFloat("max distance", &terrain->maxDistance, terrain->minDistance, 100.0f);
         }
+    }
+    ImGui::End();
+
+    ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
+    if (ImGui::Begin("Depth Map")) {
+        ImVec2 contentSize = ImGui::GetContentRegionAvail();
+        int newWidth = (int)contentSize.x;
+        int newHeight = (int)contentSize.y;
+
+        // resize the framebuffer if needed
+        if (newWidth != sceneBuffer->width || newHeight != sceneBuffer->height) {
+            newWidth = newWidth > 0 ? newWidth : 1;   // Avoid zero size
+            newHeight = newHeight > 0 ? newHeight : 1;
+            sceneBuffer->resizeFramebuffer(newWidth, newHeight);
+        }
+
+        // render the scene to the framebuffer
+        sceneBuffer->bind();
+        glViewport(0, 0, sceneBuffer->width, sceneBuffer->height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        depthQuadShader->use();
+        depthQuadShader->bindTexture("depthMap", depthMap.get());
+        glBindVertexArray(quadVAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+        sceneBuffer->unbind();
+
+        // display the framebuffer texture
+        ImGui::Image(
+            (ImTextureID)sceneBuffer->texture,
+            contentSize,
+            ImVec2(0.0f, 1.0f),
+            ImVec2(1.0f, 0.0f)
+        );
     }
     ImGui::End();
 }
