@@ -13,7 +13,7 @@ glm::mat4 DirectionalLight::getLightViewMatrix() {
 }
 
 glm::mat4 DirectionalLight::getLightProjectionMatrix() {
-    return glm::ortho(-frustumSize, frustumSize, -frustumSize, frustumSize, 0.1f, 100000.0f);
+    return glm::ortho(-frustumSize, frustumSize, -frustumSize, frustumSize, nearPlane, farPlane);
 }
 
 glm::mat4 DirectionalLight::getLightSpaceMatrix() {
