@@ -39,6 +39,9 @@ private:
     std::unique_ptr<Terrain> terrain;
     std::unique_ptr<Skybox> skybox;
     std::unique_ptr<Framebuffer> depthMap;
+    std::unique_ptr<Framebuffer> sceneBuffer;
+    std::unique_ptr<Shader> depthQuadShader;
+    unsigned int quadVAO;
 
     int width = WINDOW_WIDTH;
     int height = WINDOW_HEIGHT;
