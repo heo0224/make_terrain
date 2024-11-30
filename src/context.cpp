@@ -88,9 +88,9 @@ void Context::_renderToDepthMap() {
     if (!useShadow)
         return;
 
-    glViewport(0, 0, depthMap->width, depthMap->height);
     depthMap->bind();
     renderToDepthMap = true;
+    glViewport(0, 0, depthMap->width, depthMap->height);
     glClear(GL_DEPTH_BUFFER_BIT);
     _drawScene();
     depthMap->unbind();
@@ -129,8 +129,10 @@ void Context::renderGUI() {
                     light->updateLightDir();
                 if (ImGui::SliderFloat("elevation", &light->elevation, 0.0f, 90.0f))
                     light->updateLightDir();
-                ImGui::SliderFloat("frustum size", &light->frustumSize, 500.0f, 10000.0f);
-                ImGui::SliderFloat("light distance", &light->lightDistance, 10.0f, 500.0f);
+                ImGui::SliderFloat("frustum size", &light->frustumSize, 10.0f, 10000.0f);
+                ImGui::SliderFloat("near plane", &light->nearPlane, 0.1f, light->farPlane - 0.1f);
+                ImGui::SliderFloat("far plane", &light->farPlane, light->nearPlane + 0.1f, 1000.0f);
+                ImGui::SliderFloat("light distance", &light->lightDistance, 0.5f, 500.0f);
                 ImGui::TreePop();
             }
 
@@ -141,14 +143,14 @@ void Context::renderGUI() {
                 ImGui::SliderFloat("min shadow bias", &minShadowBias, 0.001f, maxShadowBias - 0.001f);
                 ImGui::SliderFloat("max shadow bias", &maxShadowBias, minShadowBias + 0.001f, 0.1f);
                 ImGui::SliderInt("num PCF samples", &numPCFSamples, 1, 16);
-                ImGui::SliderFloat("PCF spreadness", &PCFSpreadness, 1.0 / 5000.0f, 1.0 / 500.0f);
+                ImGui::SliderFloat("PCF spreadness", &PCFSpreadness, 1.0 / 50000.0f, 1.0 / 500.0f, "%.5f");
                 ImGui::TreePop();
             }
         }
 
         if (ImGui::CollapsingHeader("Terrain")) {
             ImGui::Checkbox("show ground", &terrain->showGround);
-            ImGui::SliderFloat("height offset", &terrain->heightOffset, -100.0f, 100.0f);
+            ImGui::SliderFloat("height offset", &terrain->heightOffset, -5.0f, 5.0f);
             ImGui::SliderFloat("height scale", &terrain->heightScale, 0.0f, 100.0f);
             ImGui::SliderFloat("horizontal scale", &terrain->horizontalScale, 0.01f, 0.1f);
             ImGui::SliderInt("min tess level", &terrain->minTessLevel, 2, terrain->maxTessLevel - 1);
