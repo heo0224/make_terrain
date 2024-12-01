@@ -7,6 +7,8 @@ in TESE_OUT {
     vec4 bottomPoint;
     vec4 fragPosLightSpace;
     vec3 normal;
+    float clipDistance;
+    float bottomClipDistance;
 } gs_in[];
 
 out GS_OUT {
@@ -68,5 +70,6 @@ void emitVertexWithAttributes(vec4 pos, int idx) {
     gs_out.color = gs_in[idx].color;
     gs_out.fragPosLightSpace = gs_in[idx].fragPosLightSpace;
     gs_out.normal = gs_in[idx].normal;
+    gl_ClipDistance[0] = gs_in[idx].clipDistance;
     EmitVertex();
 }

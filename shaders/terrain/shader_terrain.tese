@@ -11,6 +11,8 @@ out TESE_OUT {
     vec4 bottomPoint;
     vec4 fragPosLightSpace;
     vec3 normal;
+    float clipDistance;
+    float bottomClipDistance;
 } tese_out;
 
 uniform sampler2D heightMap;
@@ -22,6 +24,7 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 lightSpaceMatrix;
 uniform bool renderToDepthMap;
+uniform vec4 clipPlane;
 
 const vec4 up = vec4(0.0, 1.0, 0.0, 0.0);
 
@@ -88,5 +91,7 @@ void main()
         tese_out.bottomPoint = projection * view * model * bp;
         tese_out.normal = transpose(inverse(mat3(model))) * normal;
         tese_out.fragPosLightSpace = lightSpaceMatrix * model * tp;
+        tese_out.clipDistance = dot(model * tp, clipPlane);
+        tese_out.bottomClipDistance = dot(model * bp, vec4(0.0, 1.0, 0.0, -1.0));
     }
 }
