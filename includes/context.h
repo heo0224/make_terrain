@@ -29,7 +29,9 @@ public:
 
     friend class DirectionalLight;
     friend class Terrain;
-
+    //water
+    void _renderToWater();
+    glm::vec4 getClipPlane();
 private:
     Context() {};
     bool init();
@@ -51,6 +53,12 @@ private:
     float deltaTime = 0.0f;
     float lastTime = 0.0f;
     bool wireFrameMode = false;
+
+    //water
+    std::unique_ptr<Framebuffer> reflectionBuffer;
+    std::unique_ptr<Shader> waterShader;
+    float waterLevel = 0.3f;
+    bool renderReflection = false;
 
     // shadow mapping
     bool renderToDepthMap = false;

@@ -22,6 +22,12 @@ bool Context::init() {
         "../shaders/debug/shader_depth_quad.vs",
         "../shaders/debug/shader_depth_quad.fs"
     );
+    // water
+    reflectionBuffer = Framebuffer::create(480, 480, AttachmentType::COLOR);
+    waterShader = std::make_unique<Shader>(
+        "../shaders/shader_water.vs",
+        "../shaders/shader_water.fs"
+    );
 
     return true;
 }
@@ -104,6 +110,32 @@ void Context::_renderToScreen() {
     _drawScene();
 }
 
+void Context::_renderToWater() {
+    glEnable(GL_CLIP_DISTANCE0);
+    reflectionBuffer->bind();
+    glViewport(0, 0, reflectionBuffer->width, reflectionBuffer->height);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    renderReflection = true;
+    // flip camera
+    float distance = 2.0f * (camera->position.y - waterLevel);
+    camera->position.y -= distance;
+    camera->invertPitch();
+    _drawScene();
+    skybox->render();
+    camera->position.y += distance;
+    camera->invertPitch();
+    reflectionBuffer->unbind();
+    renderReflection = false;
+    glDisable(GL_CLIP_DISTANCE0);
+}
+
+glm::vec4 Context::getClipPlane() {
+    if (renderReflection)
+        return glm::vec4(0.0f, 1.0f, 0.0f, -waterLevel);
+    else
+        return glm::vec4(0.0f, -1.0f, 0.0f, waterLevel);
+}
+
 void Context::_drawScene() {
     terrain->render();
 }
@@ -161,6 +193,7 @@ void Context::renderGUI() {
     }
     ImGui::End();
 
+    /*
     ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Depth Map")) {
         ImVec2 contentSize = ImGui::GetContentRegionAvail();
@@ -188,6 +221,32 @@ void Context::renderGUI() {
         // display the framebuffer texture
         ImGui::Image(
             (ImTextureID)sceneBuffer->texture,
+            contentSize,
+            ImVec2(0.0f, 1.0f),
+            ImVec2(1.0f, 0.0f)
+        );
+    }
+    */
+
+    ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
+    if (ImGui::Begin("Reflection")) {
+        ImVec2 contentSize = ImGui::GetContentRegionAvail();
+        int newWidth = (int)contentSize.x;
+        int newHeight = (int)contentSize.y;
+
+        // resize the framebuffer if needed
+        if (newWidth != sceneBuffer->width || newHeight != sceneBuffer->height) {
+            newWidth = newWidth > 0 ? newWidth : 1;   // Avoid zero size
+            newHeight = newHeight > 0 ? newHeight : 1;
+            sceneBuffer->resizeFramebuffer(newWidth, newHeight);
+        }
+
+        // render the scene to the framebuffer
+        _renderToWater();
+
+        // display the framebuffer texture
+        ImGui::Image(
+            (ImTextureID)reflectionBuffer->texture,
             contentSize,
             ImVec2(0.0f, 1.0f),
             ImVec2(1.0f, 0.0f)
