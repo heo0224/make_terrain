@@ -59,6 +59,11 @@ private:
 
     glm::mat4 lightProjection, lightView;
     glm::mat4 lightSpaceMatrix;
+
+    unsigned int FBO;
+    unsigned int textureColorbuffer;
+    unsigned int RBO;
+    
 };
 
 #endif // __CONTEXT_H__

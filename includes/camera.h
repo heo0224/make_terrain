@@ -51,6 +51,7 @@ public:
     void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     void processMouseScroll(float yoffset);
     void reset();
+    void invertPitch();
 private:
     void updateCameraVectors();
 };
