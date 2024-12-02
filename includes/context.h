@@ -9,6 +9,7 @@
 #include "skybox.h"
 #include "light.h"
 #include "framebuffer.h"
+#include "water.h"
 
 class Context {
 public:
@@ -31,6 +32,12 @@ public:
     friend class Terrain;
     //water
     void _renderToWater();
+    float waterLevel = 0.3f;
+    float waterSize = 100.0f;
+    float tiling = 10.0f;
+    bool renderReflection = false;
+    unsigned int waterVAO;
+    float mixFactor = 0.0f;
     glm::vec4 getClipPlane();
 private:
     Context() {};
@@ -55,10 +62,7 @@ private:
     bool wireFrameMode = false;
 
     //water
-    std::unique_ptr<Framebuffer> reflectionBuffer;
-    std::unique_ptr<Shader> waterShader;
-    float waterLevel = 0.3f;
-    bool renderReflection = false;
+    std::unique_ptr<Water> water;
 
     // shadow mapping
     bool renderToDepthMap = false;

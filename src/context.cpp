@@ -15,6 +15,7 @@ bool Context::init() {
     light = std::make_unique<DirectionalLight>(this);
     skybox = std::make_unique<Skybox>(this);
     terrain = Terrain::createWithTessellation(this);
+    water = std::make_unique<Water>(this);
     depthMap = Framebuffer::create(1024, 1024, AttachmentType::DEPTH);
     sceneBuffer = Framebuffer::create(width, height, AttachmentType::COLOR);
     quadVAO = generatePositionTextureVAOWithEBO(quadPositionTextures, sizeof(quadPositionTextures), quadIndices, sizeof(quadIndices));
@@ -22,13 +23,6 @@ bool Context::init() {
         "../shaders/debug/shader_depth_quad.vs",
         "../shaders/debug/shader_depth_quad.fs"
     );
-    // water
-    reflectionBuffer = Framebuffer::create(480, 480, AttachmentType::COLOR);
-    waterShader = std::make_unique<Shader>(
-        "../shaders/shader_water.vs",
-        "../shaders/shader_water.fs"
-    );
-
     return true;
 }
 
@@ -112,20 +106,30 @@ void Context::_renderToScreen() {
 
 void Context::_renderToWater() {
     glEnable(GL_CLIP_DISTANCE0);
-    reflectionBuffer->bind();
-    glViewport(0, 0, reflectionBuffer->width, reflectionBuffer->height);
+    // reflection
+    water->reflectionBuffer->bind();
+    glViewport(0, 0, water->reflectionBuffer->width, water->reflectionBuffer->height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderReflection = true;
     // flip camera
     float distance = 2.0f * (camera->position.y - waterLevel);
     camera->position.y -= distance;
     camera->invertPitch();
-    _drawScene();
+    terrain->render();
     skybox->render();
+    // flip back
     camera->position.y += distance;
     camera->invertPitch();
-    reflectionBuffer->unbind();
+    water->reflectionBuffer->unbind();
+    
+    // refraction
+    water->refractionBuffer->bind();
+    glViewport(0, 0, water->refractionBuffer->width, water->refractionBuffer->height);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderReflection = false;
+    terrain->render();
+    skybox->render();
+    water->refractionBuffer->unbind();    
     glDisable(GL_CLIP_DISTANCE0);
 }
 
@@ -138,6 +142,7 @@ glm::vec4 Context::getClipPlane() {
 
 void Context::_drawScene() {
     terrain->render();
+    water->render();
 }
 
 void Context::renderGUI() {
@@ -189,6 +194,11 @@ void Context::renderGUI() {
             ImGui::SliderInt("max tess level", &terrain->maxTessLevel, terrain->minTessLevel + 1, 64);
             ImGui::SliderFloat("min distance", &terrain->minDistance, 1.0f, terrain->maxDistance);
             ImGui::SliderFloat("max distance", &terrain->maxDistance, terrain->minDistance, 100.0f);
+        }
+
+        if (ImGui::CollapsingHeader("Water")) {
+            ImGui::SliderFloat("water level", &waterLevel, -5.0f, 5.0f);
+            ImGui::SliderFloat("mix factor", &mixFactor, 0.0f, 1.0f);
         }
     }
     ImGui::End();
@@ -246,11 +256,12 @@ void Context::renderGUI() {
 
         // display the framebuffer texture
         ImGui::Image(
-            (ImTextureID)reflectionBuffer->texture,
+            (ImTextureID)water->reflectionBuffer->texture,
             contentSize,
             ImVec2(0.0f, 1.0f),
             ImVec2(1.0f, 0.0f)
         );
     }
     ImGui::End();
+    
 }
