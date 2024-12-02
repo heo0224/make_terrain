@@ -14,9 +14,9 @@ uniform sampler2D dudvMap;
 uniform sampler2D normalMap;
 
 uniform bool useDUDV;
-uniform float mixfactor;
 uniform float moveFactor;
 
+uniform float tiling;
 const float waveStrength = 0.01;
 
 void main()
@@ -26,7 +26,7 @@ void main()
     vec2 refractionTexCoord = vec2(ndc.x, ndc.y);
 
 
-    vec2 texCoord = In.TexCoord;
+    vec2 texCoord = In.TexCoord * tiling;
     if (useDUDV)
     {
         vec2 distortedTexCoord = texture(dudvMap, vec2(texCoord.x + moveFactor, texCoord.y)).rg*0.1;
@@ -41,6 +41,9 @@ void main()
     vec4 reflectionColor = texture(reflectionTexture, reflectionTexCoord);
     vec4 refractionColor = texture(refractionTexture, refractionTexCoord);
     vec4 blue = vec4(0.0, 0.2, 0.8, 1.0);
-    FragColor = mix(reflectionColor, refractionColor, mixfactor);
+    vec3 up = vec3(0.0, 1.0, 0.0);
+    float reflectiveFactor = dot(normalize(In.toCamera), up);
+    // reflectiveFactor = pow(reflectiveFactor, 2);
+    FragColor = mix(reflectionColor, refractionColor, reflectiveFactor);
     FragColor = mix(FragColor, blue, 0.1);
 }
