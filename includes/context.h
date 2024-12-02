@@ -32,10 +32,8 @@ public:
     friend class Terrain;
     //water
     void _renderToWater();
-    float waterLevel = 0.3f;
-    float waterSize = 100.0f;
-    float tiling = 10.0f;
     bool renderReflection = false;
+    bool useDUDV = true;
     unsigned int waterVAO;
     float mixFactor = 0.0f;
     glm::vec4 getClipPlane();
