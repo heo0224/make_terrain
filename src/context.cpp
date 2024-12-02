@@ -114,7 +114,7 @@ void Context::_renderToWater() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderReflection = true;
     // flip camera
-    float distance = 2.0f * (camera->position.y - waterLevel);
+    float distance = 2.0f * (camera->position.y - water->waterLevel);
     camera->position.y -= distance;
     camera->invertPitch();
     terrain->render();
@@ -137,9 +137,9 @@ void Context::_renderToWater() {
 
 glm::vec4 Context::getClipPlane() {
     if (renderReflection)
-        return glm::vec4(0.0f, 1.0f, 0.0f, -waterLevel);
+        return glm::vec4(0.0f, 1.0f, 0.0f, -water->waterLevel);
     else
-        return glm::vec4(0.0f, -1.0f, 0.0f, waterLevel);
+        return glm::vec4(0.0f, -1.0f, 0.0f, water->waterLevel);
 }
 
 void Context::_drawScene() {
@@ -199,7 +199,9 @@ void Context::renderGUI() {
         }
 
         if (ImGui::CollapsingHeader("Water")) {
-            ImGui::SliderFloat("water level", &waterLevel, 0.0f, 5.0f);
+            ImGui::SliderFloat("water level", &water->waterLevel, 0.0f, 5.0f);
+            ImGui::SliderFloat("water size", &water->waterSize, 10.0f, 100.0f);
+            ImGui::SliderFloat("wave speed", &water->WAVE_SPEED, 0.0f, 0.1f);
             ImGui::SliderFloat("mix factor", &mixFactor, 0.0f, 1.0f);
         }
     }
