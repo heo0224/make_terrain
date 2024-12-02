@@ -202,7 +202,7 @@ void Context::renderGUI() {
             ImGui::SliderFloat("water level", &water->waterLevel, 0.0f, 5.0f);
             ImGui::SliderFloat("water size", &water->waterSize, 10.0f, 100.0f);
             ImGui::SliderFloat("wave speed", &water->WAVE_SPEED, 0.0f, 0.1f);
-            ImGui::SliderFloat("mix factor", &mixFactor, 0.0f, 1.0f);
+            ImGui::SliderFloat("tiling factor", &water->tiling, 1.0f, 20.0f);
         }
     }
     ImGui::End();
