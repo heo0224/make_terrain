@@ -237,7 +237,7 @@ void Context::renderGUI() {
         );
     }
     */
-
+   /*
     ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Reflection")) {
         ImVec2 contentSize = ImGui::GetContentRegionAvail();
@@ -263,5 +263,6 @@ void Context::renderGUI() {
         );
     }
     ImGui::End();
+   */
     
 }
