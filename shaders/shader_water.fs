@@ -6,13 +6,22 @@ in Data{
     vec3 Normal;
     vec3 toCamera;
     vec3 fromLight;
-    vec3 Pos;
+    vec4 Pos;
 } In;
 
-uniform sampler2D texture0;
-
+uniform sampler2D reflectionTexture;
+uniform sampler2D refractionTexture;
+uniform float mixfactor;
 void main()
 {
-    // FragColor = texture(texture0, TexCoord);
-    FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+    vec2 ndc = (In.Pos.xy / In.Pos.w) * 0.5 + 0.5;
+    vec2 reflectionTexCoord = vec2(ndc.x, -ndc.y);
+    vec2 refractionTexCoord = vec2(ndc.x, ndc.y);
+
+    vec4 reflectionColor = texture(reflectionTexture, reflectionTexCoord);
+    vec4 refractionColor = texture(refractionTexture, refractionTexCoord);
+    // Debug individual textures (optional)
+    // FragColor = reflectionColor; return; // Test reflection
+    // FragColor = refractionColor; return; // Test refraction
+    FragColor = mix(reflectionColor, refractionColor, mixfactor);
 }

@@ -92,3 +92,8 @@ void Camera::updateCameraVectors() {
     this->right = glm::normalize(glm::cross(this->front, this->worldUp));  // Normalize the vectors
     this->up = glm::normalize(glm::cross(this->right, this->front));
 }
+
+void Camera::invertPitch() {
+    pitch = -pitch;
+    updateCameraVectors();
+}
