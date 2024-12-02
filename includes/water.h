@@ -20,6 +20,7 @@ public:
     float WAVE_SPEED = 0.02f;
     float waterLevel = 0.3f;
     float waterSize = 100.0f;
+    float tiling = 10.0f;
 private:
     void init();
     Context* context;

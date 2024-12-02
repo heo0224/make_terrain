@@ -15,12 +15,13 @@ uniform mat4 view;
 uniform mat4 projection;
 
 uniform vec3 lightPos;
-uniform int tiling;
+uniform vec3 cameraPos;
 
 void main()
 {
     vec4 worldPos = model * vec4(aPos, 1.0);
 	Out.TexCoord = vec2(aTexCoord.x, aTexCoord.y);
     Out.Pos = projection * view * worldPos;
+    Out.toCamera = cameraPos - worldPos.xyz;
 	gl_Position = projection * view * model * vec4(aPos, 1.0f);
 }
