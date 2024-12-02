@@ -78,6 +78,7 @@ void Context::mouseButton(int button, int action, double x, double y) {
 
 void Context::render() {
     _renderToDepthMap();
+    _renderToWater();
     _renderToScreen();
 
     // render skybox at last separately
@@ -197,7 +198,7 @@ void Context::renderGUI() {
         }
 
         if (ImGui::CollapsingHeader("Water")) {
-            ImGui::SliderFloat("water level", &waterLevel, -5.0f, 5.0f);
+            ImGui::SliderFloat("water level", &waterLevel, 0.0f, 5.0f);
             ImGui::SliderFloat("mix factor", &mixFactor, 0.0f, 1.0f);
         }
     }
@@ -250,9 +251,6 @@ void Context::renderGUI() {
             newHeight = newHeight > 0 ? newHeight : 1;
             sceneBuffer->resizeFramebuffer(newWidth, newHeight);
         }
-
-        // render the scene to the framebuffer
-        _renderToWater();
 
         // display the framebuffer texture
         ImGui::Image(
