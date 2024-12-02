@@ -21,8 +21,7 @@ public:
     CubemapTexture(const std::vector<std::string>& faces);
 };
 
-class DepthMapTexture 
-{
+class DepthMapTexture {
 public:
 	unsigned int ID;
 	unsigned int depthMapFBO;

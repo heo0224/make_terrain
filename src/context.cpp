@@ -23,6 +23,7 @@ bool Context::init() {
         "../shaders/debug/shader_depth_quad.vs",
         "../shaders/debug/shader_depth_quad.fs"
     );
+
     return true;
 }
 
@@ -205,6 +206,9 @@ void Context::renderGUI() {
     ImGui::End();
 
     /*
+    }
+    ImGui::End();
+
     ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Depth Map")) {
         ImVec2 contentSize = ImGui::GetContentRegionAvail();
@@ -262,5 +266,5 @@ void Context::renderGUI() {
     }
     ImGui::End();
    */
-    
+
 }
