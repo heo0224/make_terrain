@@ -17,6 +17,9 @@ public:
     std::unique_ptr<Framebuffer> reflectionBuffer;
     std::unique_ptr<Framebuffer> refractionBuffer;
     void render();
+    float WAVE_SPEED = 0.02f;
+    float waterLevel = 0.3f;
+    float waterSize = 100.0f;
 private:
     void init();
     Context* context;
