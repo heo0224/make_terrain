@@ -47,7 +47,7 @@ CubemapTexture::CubemapTexture(const std::vector<std::string>& faces)
         }
         else
         {
-            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            SPDLOG_ERROR("Cubemap texture failed to load at path: " + faces[i]);
             stbi_image_free(data);
         }
     }
@@ -57,4 +57,26 @@ CubemapTexture::CubemapTexture(const std::vector<std::string>& faces)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+}
+
+DepthMapTexture::DepthMapTexture(int shadow_width, int shadow_height) 
+{
+    width = shadow_width;
+    height = shadow_height;
+    glGenFramebuffers(1, &depthMapFBO);
+    glGenTextures(1, &ID);
+    glBindTexture(GL_TEXTURE_2D, ID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    // attach depth texture as FBO's depth buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, ID, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

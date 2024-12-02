@@ -9,6 +9,7 @@
 #include "skybox.h"
 #include "light.h"
 #include "framebuffer.h"
+#include "water.h"
 
 class Context {
 public:
@@ -26,10 +27,18 @@ public:
     glm::mat4 getModelMatrix(glm::vec3 transl = glm::vec3(0.0f), glm::vec3 axis = glm::vec3(0.0f, 1.0f, 0.0f), float angleInDeg = 0.0f, glm::vec3 scale = glm::vec3(1.0f));
     glm::mat4 getViewMatrix();
     glm::mat4 getProjectionMatrix();
-
+ 
     friend class DirectionalLight;
     friend class Terrain;
-
+    //water
+    void _renderToWater();
+    float waterLevel = 0.3f;
+    float waterSize = 100.0f;
+    float tiling = 10.0f;
+    bool renderReflection = false;
+    unsigned int waterVAO;
+    float mixFactor = 0.0f;
+    glm::vec4 getClipPlane();
 private:
     Context() {};
     bool init();
@@ -51,6 +60,9 @@ private:
     float deltaTime = 0.0f;
     float lastTime = 0.0f;
     bool wireFrameMode = false;
+ 
+    //water
+    std::unique_ptr<Water> water;
 
     // shadow mapping
     bool renderToDepthMap = false;

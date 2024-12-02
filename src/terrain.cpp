@@ -111,6 +111,9 @@ void Terrain::render() {
     shader->setInt("numPCFSamples", context->numPCFSamples);
     shader->setFloat("PCFSpreadness", context->PCFSpreadness);
 
+    // clip plane
+    shader->setVec4("clipPlane", context->getClipPlane());
+
     glBindVertexArray(VAO);
     glDrawArrays(GL_PATCHES, 0, 4 * numStrips * numStrips);
 }
