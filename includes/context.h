@@ -27,7 +27,7 @@ public:
     glm::mat4 getModelMatrix(glm::vec3 transl = glm::vec3(0.0f), glm::vec3 axis = glm::vec3(0.0f, 1.0f, 0.0f), float angleInDeg = 0.0f, glm::vec3 scale = glm::vec3(1.0f));
     glm::mat4 getViewMatrix();
     glm::mat4 getProjectionMatrix();
-
+ 
     friend class DirectionalLight;
     friend class Terrain;
     //water
@@ -60,7 +60,7 @@ private:
     float deltaTime = 0.0f;
     float lastTime = 0.0f;
     bool wireFrameMode = false;
-
+ 
     //water
     std::unique_ptr<Water> water;
 
