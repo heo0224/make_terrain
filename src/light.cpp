@@ -29,5 +29,5 @@ void DirectionalLight::updateLightDir() {
     float x = cos(azimuthRad) * cos(elevationRad);
     float y = sin(elevationRad);
     float z = -sin(azimuthRad) * cos(elevationRad);
-    direction = glm::vec3(-x, -y, -z);
+    direction = glm::normalize(glm::vec3(-x, -y, -z));
 }
