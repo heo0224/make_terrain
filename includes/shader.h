@@ -18,6 +18,7 @@ public:
     void use();
     void bindTexture(const std::string& name, const Texture* texture, int unit = 0);
     void bindTexture(const std::string& name, const Framebuffer* framebuffer, int unit = 0);
+    void bindTexture(const std::string& anme, unsigned int textureID, int unit = 0);
     void bindCubemapTexture(const std::string& name, const CubemapTexture* texture, int unit = 0);
     void setBool(const std::string& name, bool value) const;
     void setInt(const std::string& name, int value) const;

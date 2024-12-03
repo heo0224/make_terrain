@@ -100,4 +100,15 @@ const float skyBoxPositions[] = {
      1.0f, -1.0f,  1.0f
 };
 
+const float screenQuadVertices[] = {
+    // positions        // texCoords
+    -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+     1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+
+    -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+     1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+     1.0f,  1.0f, 0.0f, 1.0f, 1.0f
+};
+
 #endif // __GEOMETRY_PRIMITIVES_H__
