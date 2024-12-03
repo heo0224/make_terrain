@@ -132,7 +132,7 @@ void Context::_renderToWater() {
     camera->position.y += distance;
     camera->invertPitch();
     water->reflectionBuffer->unbind();
-    
+
     // refraction
     water->refractionBuffer->bind();
     glViewport(0, 0, water->refractionBuffer->width, water->refractionBuffer->height);
@@ -140,7 +140,7 @@ void Context::_renderToWater() {
     renderReflection = false;
     terrain->render();
     skybox->render();
-    water->refractionBuffer->unbind();    
+    water->refractionBuffer->unbind();
     glDisable(GL_CLIP_DISTANCE0);
     terrain->showGround = tempShowGround;
 }
@@ -266,29 +266,29 @@ void Context::renderGUI() {
         );
     }
     */
-   /*
-    ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
-    if (ImGui::Begin("Reflection")) {
-        ImVec2 contentSize = ImGui::GetContentRegionAvail();
-        int newWidth = (int)contentSize.x;
-        int newHeight = (int)contentSize.y;
+    /*
+     ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
+     if (ImGui::Begin("Reflection")) {
+         ImVec2 contentSize = ImGui::GetContentRegionAvail();
+         int newWidth = (int)contentSize.x;
+         int newHeight = (int)contentSize.y;
 
-        // resize the framebuffer if needed
-        if (newWidth != sceneBuffer->width || newHeight != sceneBuffer->height) {
-            newWidth = newWidth > 0 ? newWidth : 1;   // Avoid zero size
-            newHeight = newHeight > 0 ? newHeight : 1;
-            sceneBuffer->resizeFramebuffer(newWidth, newHeight);
-        }
+         // resize the framebuffer if needed
+         if (newWidth != sceneBuffer->width || newHeight != sceneBuffer->height) {
+             newWidth = newWidth > 0 ? newWidth : 1;   // Avoid zero size
+             newHeight = newHeight > 0 ? newHeight : 1;
+             sceneBuffer->resizeFramebuffer(newWidth, newHeight);
+         }
 
-        // display the framebuffer texture
-        ImGui::Image(
-            (ImTextureID)water->reflectionBuffer->texture,
-            contentSize,
-            ImVec2(0.0f, 1.0f),
-            ImVec2(1.0f, 0.0f)
-        );
-    }
-    ImGui::End();
-   */
+         // display the framebuffer texture
+         ImGui::Image(
+             (ImTextureID)water->reflectionBuffer->texture,
+             contentSize,
+             ImVec2(0.0f, 1.0f),
+             ImVec2(1.0f, 0.0f)
+         );
+     }
+     ImGui::End();
+    */
 
 }

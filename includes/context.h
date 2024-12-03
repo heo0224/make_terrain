@@ -29,7 +29,7 @@ public:
     glm::mat4 getViewMatrix();
     glm::mat4 getProjectionMatrix();
     glm::vec3 getCameraPosition(); // added for Water class
- 
+
     friend class DirectionalLight;
     friend class Terrain;
     friend class Water;
@@ -65,7 +65,7 @@ private:
     float deltaTime = 0.0f;
     float lastTime = 0.0f;
     bool wireFrameMode = false;
- 
+
     //water
     std::unique_ptr<Water> water;
 

@@ -7,7 +7,7 @@ Water::Water(Context* context) : context(context) {
     init();
 }
 
-void Water::init(){
+void Water::init() {
     this->reflectionBuffer = Framebuffer::create(this->width, this->height, AttachmentType::COLOR);
     this->refractionBuffer = Framebuffer::create(this->width, this->height, AttachmentType::COLOR);
     waterShader = std::make_unique<Shader>(
@@ -19,11 +19,11 @@ void Water::init(){
     waterVAO = generatePositionTextureVAOWithEBO(quadPositionTextures, sizeof(quadPositionTextures), quadIndices, sizeof(quadIndices));
 }
 
-void Water::render(){
+void Water::render() {
     waterShader->use();
-    waterShader->bindTexture("reflectionTexture", reflectionBuffer.get(),0);
-    waterShader->bindTexture("refractionTexture", refractionBuffer.get(),1);
-    waterShader->bindTexture("dudvMap", dudvMap.get(),2);
+    waterShader->bindTexture("reflectionTexture", reflectionBuffer.get(), 0);
+    waterShader->bindTexture("refractionTexture", refractionBuffer.get(), 1);
+    waterShader->bindTexture("dudvMap", dudvMap.get(), 2);
     waterVAO = generatePositionTextureVAOWithEBO(quadPositionTextures, sizeof(quadPositionTextures), quadIndices, sizeof(quadIndices));
     glBindVertexArray(waterVAO);
     waterShader->setMat4("projection", context->getProjectionMatrix());
