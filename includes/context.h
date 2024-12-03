@@ -28,6 +28,7 @@ public:
     glm::mat4 getModelMatrix(glm::vec3 transl = glm::vec3(0.0f), glm::vec3 axis = glm::vec3(0.0f, 1.0f, 0.0f), float angleInDeg = 0.0f, glm::vec3 scale = glm::vec3(1.0f));
     glm::mat4 getViewMatrix();
     glm::mat4 getProjectionMatrix();
+    glm::vec3 getCameraPosition(); // added for Water class
  
     friend class DirectionalLight;
     friend class Terrain;
@@ -37,7 +38,6 @@ public:
     bool renderReflection = false;
     bool useDUDV = true;
     unsigned int waterVAO;
-    float mixFactor = 0.0f;
     glm::vec4 getClipPlane();
 
     // fog
@@ -95,6 +95,10 @@ inline glm::mat4 Context::getViewMatrix() {
 
 inline glm::mat4 Context::getProjectionMatrix() {
     return glm::perspective(glm::radians(camera->zoom), (float)this->width / (float)this->height, 0.1f, 100000.0f);
+}
+
+inline glm::vec3 Context::getCameraPosition() {
+    return camera->position;
 }
 
 #endif // __CONTEXT_H__

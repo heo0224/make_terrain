@@ -33,10 +33,11 @@ void Water::render(){
     model = glm::translate(model, glm::vec3(0.0f, waterLevel, 0.0f));
     model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     waterShader->setMat4("model", model);
-    waterShader->setFloat("mixfactor", context->mixFactor);
     waterShader->setBool("useDUDV", context->useDUDV);
     float moveFactor = WAVE_SPEED * glfwGetTime();
     moveFactor = fmod(moveFactor, 1.0f);
     waterShader->setFloat("moveFactor", moveFactor);
+    waterShader->setFloat("tiling", tiling);
+    waterShader->setVec3("cameraPos", context->getCameraPosition());
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
