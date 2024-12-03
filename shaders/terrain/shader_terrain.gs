@@ -9,6 +9,8 @@ in TESE_OUT {
     vec3 normal;
     float clipDistance;
     float bottomClipDistance;
+    bool isCloseToBorder;
+    bool isAdjacentToBorder;
 } gs_in[];
 
 out GS_OUT {
@@ -32,9 +34,14 @@ void main()
     vec4 b0 = gs_in[0].bottomPoint;
     vec4 b1 = gs_in[1].bottomPoint;
     vec4 b2 = gs_in[2].bottomPoint;
+    bool isAdjacentToBorder = gs_in[0].isAdjacentToBorder || gs_in[1].isAdjacentToBorder || gs_in[2].isAdjacentToBorder;
+    bool isCloseToBorder = gs_in[0].isCloseToBorder || gs_in[1].isCloseToBorder || gs_in[2].isCloseToBorder;
+
+    if (isAdjacentToBorder)
+        return;
 
     addTriangle(v0, v1, v2, 0, 1, 2);  // top triangle
-    if (showGround && !renderToDepthMap) {
+    if (showGround && !renderToDepthMap && isCloseToBorder) {
         addTriangle(b2, b1, b0, 2, 1, 0);  // bottom triangle (reverse winding order for correct face culling)
         addQuad(v0, v1, b1, b0, 0, 1, 1, 0);  // side 1
         addQuad(v1, v2, b2, b1, 1, 2, 2, 1);  // side 2
