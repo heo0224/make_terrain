@@ -108,6 +108,8 @@ void Context::_renderToScreen() {
 
 void Context::_renderToWater() {
     glEnable(GL_CLIP_DISTANCE0);
+    bool tempShowGround = terrain->showGround;
+    terrain->showGround = false;
     // reflection
     water->reflectionBuffer->bind();
     glViewport(0, 0, water->reflectionBuffer->width, water->reflectionBuffer->height);
@@ -133,6 +135,7 @@ void Context::_renderToWater() {
     skybox->render();
     water->refractionBuffer->unbind();    
     glDisable(GL_CLIP_DISTANCE0);
+    terrain->showGround = tempShowGround;
 }
 
 glm::vec4 Context::getClipPlane() {
@@ -199,10 +202,10 @@ void Context::renderGUI() {
         }
 
         if (ImGui::CollapsingHeader("Water")) {
-            ImGui::SliderFloat("water level", &water->waterLevel, 0.0f, 5.0f);
+            ImGui::SliderFloat("water level", &water->waterLevel, 0.0f, 20.0f);
             ImGui::SliderFloat("water size", &water->waterSize, 10.0f, 100.0f);
             ImGui::SliderFloat("wave speed", &water->WAVE_SPEED, 0.0f, 0.1f);
-            ImGui::SliderFloat("tiling factor", &water->tiling, 1.0f, 20.0f);
+            ImGui::SliderFloat("tiling factor", &water->tiling, 1.0f, 10.0f);
         }
     }
     ImGui::End();
