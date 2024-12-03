@@ -16,7 +16,7 @@ public:
 
     float heightScale = 9.0f;
     float heightOffset = 0.0f;
-    float horizontalScale = 0.03f;
+    float horizontalScale = 30.0f;
     int numStrips = 20;
     int minTessLevel = 2;
     int maxTessLevel = 16;

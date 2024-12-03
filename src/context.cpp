@@ -208,7 +208,7 @@ void Context::renderGUI() {
             ImGui::Checkbox("show ground", &terrain->showGround);
             ImGui::SliderFloat("height offset", &terrain->heightOffset, -5.0f, 5.0f);
             ImGui::SliderFloat("height scale", &terrain->heightScale, 0.0f, 100.0f);
-            ImGui::SliderFloat("horizontal scale", &terrain->horizontalScale, 0.01f, 0.1f);
+            ImGui::SliderFloat("horizontal scale", &terrain->horizontalScale, 1.0f, 100.0f);
             ImGui::SliderInt("min tess level", &terrain->minTessLevel, 2, terrain->maxTessLevel - 1);
             ImGui::SliderInt("max tess level", &terrain->maxTessLevel, terrain->minTessLevel + 1, 64);
             ImGui::SliderFloat("min distance", &terrain->minDistance, 1.0f, terrain->maxDistance);
