@@ -5,7 +5,8 @@
 
 enum class AttachmentType {
     COLOR,
-    DEPTH
+    DEPTH,
+    COLOR_AND_DEPTH
 };
 
 enum class BindType {
@@ -24,10 +25,13 @@ public:
     int width;
     int height;
     unsigned int texture;
+    unsigned int colorTexture;
+    unsigned int depthTexture;
 private:
     Framebuffer() {};
     bool initWithColorAttachment(int width, int height);
     bool initWithDepthAttachment(int width, int height);
+    bool initWithColorAndDepthAttachment(int width, int height);
     unsigned int FBO;
     unsigned int RBO;
 };

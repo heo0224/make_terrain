@@ -16,8 +16,10 @@ bool Context::init() {
     skybox = std::make_unique<Skybox>(this);
     terrain = Terrain::createWithTessellation(this);
     water = std::make_unique<Water>(this);
+    fog = std::make_unique<Fog>(this);
     depthMap = Framebuffer::create(1024, 1024, AttachmentType::DEPTH);
     sceneBuffer = Framebuffer::create(width, height, AttachmentType::COLOR);
+    sceneDepthBuffer = Framebuffer::create(width, height, AttachmentType::COLOR_AND_DEPTH);
     quadVAO = generatePositionTextureVAOWithEBO(quadPositionTextures, sizeof(quadPositionTextures), quadIndices, sizeof(quadIndices));
     depthQuadShader = std::make_unique<Shader>(
         "../shaders/debug/shader_depth_quad.vs",
@@ -83,7 +85,10 @@ void Context::render() {
     _renderToScreen();
 
     // render skybox at last separately
+    sceneDepthBuffer->bind();
     skybox->render();
+    sceneDepthBuffer->unbind();
+    _renderToScreenWithFog();
 }
 
 void Context::_renderToDepthMap() {
@@ -101,9 +106,11 @@ void Context::_renderToDepthMap() {
 
 void Context::_renderToScreen() {
     assert(!renderToDepthMap);
+    sceneDepthBuffer->bind();
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _drawScene();
+    sceneDepthBuffer->unbind();
 }
 
 void Context::_renderToWater() {
@@ -133,6 +140,13 @@ void Context::_renderToWater() {
     skybox->render();
     water->refractionBuffer->unbind();    
     glDisable(GL_CLIP_DISTANCE0);
+}
+
+void Context::_renderToScreenWithFog() {
+    glDisable(GL_DEPTH_TEST);
+    glViewport(0, 0, width, height);
+    fog->render();
+    glEnable(GL_DEPTH_TEST);
 }
 
 glm::vec4 Context::getClipPlane() {
@@ -203,6 +217,10 @@ void Context::renderGUI() {
             ImGui::SliderFloat("water size", &water->waterSize, 10.0f, 100.0f);
             ImGui::SliderFloat("wave speed", &water->WAVE_SPEED, 0.0f, 0.1f);
             ImGui::SliderFloat("mix factor", &mixFactor, 0.0f, 1.0f);
+        }
+
+        if (ImGui::CollapsingHeader("Fog")) {
+            ImGui::SliderFloat("fog density", &fog->fogDensity, 0.0f, 10000.0f);
         }
     }
     ImGui::End();

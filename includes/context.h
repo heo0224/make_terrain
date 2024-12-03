@@ -10,6 +10,7 @@
 #include "light.h"
 #include "framebuffer.h"
 #include "water.h"
+#include "fog.h"
 
 class Context {
 public:
@@ -30,6 +31,7 @@ public:
  
     friend class DirectionalLight;
     friend class Terrain;
+    friend class Fog;
     //water
     void _renderToWater();
     bool renderReflection = false;
@@ -37,6 +39,9 @@ public:
     unsigned int waterVAO;
     float mixFactor = 0.0f;
     glm::vec4 getClipPlane();
+
+    // fog
+    void _renderToScreenWithFog();
 private:
     Context() {};
     bool init();
@@ -47,6 +52,7 @@ private:
     std::unique_ptr<Skybox> skybox;
     std::unique_ptr<Framebuffer> depthMap;
     std::unique_ptr<Framebuffer> sceneBuffer;
+    std::unique_ptr<Framebuffer> sceneDepthBuffer;
     std::unique_ptr<Shader> depthQuadShader;
     unsigned int quadVAO;
 
@@ -61,6 +67,9 @@ private:
  
     //water
     std::unique_ptr<Water> water;
+
+    //fog
+    std::unique_ptr<Fog> fog;
 
     // shadow mapping
     bool renderToDepthMap = false;
