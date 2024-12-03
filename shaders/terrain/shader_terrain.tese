@@ -13,6 +13,8 @@ out TESE_OUT {
     vec3 normal;
     float clipDistance;
     float bottomClipDistance;
+    bool isCloseToBorder;
+    bool isAdjacentToBorder;
 } tese_out;
 
 uniform sampler2D heightMap;
@@ -93,5 +95,17 @@ void main()
         tese_out.fragPosLightSpace = lightSpaceMatrix * model * tp;
         tese_out.clipDistance = dot(model * tp, clipPlane);
         tese_out.bottomClipDistance = dot(model * bp, vec4(0.0, 1.0, 0.0, -1.0));
+        if (texCoord.x < 0.001 || texCoord.x > 0.999 || texCoord.y < 0.001 || texCoord.y > 0.999) {
+            tese_out.isAdjacentToBorder = true;
+            tese_out.isCloseToBorder = false;
+        }
+        else if (texCoord.x < 0.01 || texCoord.x > 0.99 || texCoord.y < 0.01 || texCoord.y > 0.99) {
+            tese_out.isAdjacentToBorder = false;
+            tese_out.isCloseToBorder = true;
+        }
+        else {
+            tese_out.isAdjacentToBorder = false;
+            tese_out.isCloseToBorder = false;
+        }
     }
 }
