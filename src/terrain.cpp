@@ -76,7 +76,7 @@ void Terrain::render() {
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f),
         0.0f,
-        glm::vec3(horizontalScale, 1.0f, horizontalScale)
+        glm::vec3(horizontalScale / (float)heightMap->width, 1.0f, horizontalScale / (float)heightMap->height)
     );
     glm::mat4 view = context->getViewMatrix();
     glm::mat4 projection = context->getProjectionMatrix();

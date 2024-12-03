@@ -32,6 +32,7 @@ public:
  
     friend class DirectionalLight;
     friend class Terrain;
+    friend class Water;
     friend class Fog;
     //water
     void _renderToWater();

@@ -29,7 +29,7 @@ void Water::render(){
     waterShader->setMat4("projection", context->getProjectionMatrix());
     waterShader->setMat4("view", context->getViewMatrix());
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(waterSize, 1.0f, waterSize));
+    model = glm::scale(model, glm::vec3(context->terrain->horizontalScale, 1.0f, context->terrain->horizontalScale));
     model = glm::translate(model, glm::vec3(0.0f, waterLevel, 0.0f));
     model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     waterShader->setMat4("model", model);
