@@ -202,6 +202,7 @@ void Context::renderGUI() {
         }
 
         if (ImGui::CollapsingHeader("Water")) {
+            ImGui::Checkbox("use DUDV", &useDUDV);
             ImGui::SliderFloat("water level", &water->waterLevel, 0.0f, 20.0f);
             ImGui::SliderFloat("water size", &water->waterSize, 10.0f, 100.0f);
             ImGui::SliderFloat("wave speed", &water->WAVE_SPEED, 0.0f, 0.1f);
