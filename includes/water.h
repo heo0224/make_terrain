@@ -8,7 +8,7 @@
 
 class Context;  // forward declaration
 
-class Water{
+class Water {
 public:
     Water(Context* context);
 

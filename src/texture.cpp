@@ -59,7 +59,7 @@ CubemapTexture::CubemapTexture(const std::vector<std::string>& faces)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
-DepthMapTexture::DepthMapTexture(int shadow_width, int shadow_height) 
+DepthMapTexture::DepthMapTexture(int shadow_width, int shadow_height)
 {
     width = shadow_width;
     height = shadow_height;
