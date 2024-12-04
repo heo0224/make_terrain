@@ -21,6 +21,7 @@ public:
     float waterLevel = 0.3f;
     float waterSize = 100.0f;
     float tiling = 10.0f;
+    bool useDUDV = true;
 private:
     void init();
     Context* context;

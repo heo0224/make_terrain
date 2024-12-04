@@ -72,6 +72,9 @@ void Terrain::resetVertices() {
 }
 
 void Terrain::render() {
+    if (!context->renderTerrain)
+        return;
+
     glm::mat4 model = context->getModelMatrix(
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f),
@@ -103,7 +106,7 @@ void Terrain::render() {
 
     // shadow
     shader->bindTexture("depthMap", context->depthMap.get(), 2);
-    shader->setBool("renderToDepthMap", context->renderToDepthMap);
+    shader->setBool("renderToDepthMap", context->isRenderingToDepthMap);
     shader->setBool("useShadow", context->useShadow);
     shader->setBool("usePCF", context->usePCF);
     shader->setFloat("minShadowBias", context->minShadowBias);

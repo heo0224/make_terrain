@@ -84,40 +84,43 @@ void Context::mouseButton(int button, int action, double x, double y) {
 }
 
 void Context::render() {
-    _renderToDepthMap();
-    _renderToWater();
+    _renderToShadowFramebuffer();
+    _renderToWaterFramebuffer();
+    _renderToFogFramebuffer();
     _renderToScreen();
-
-    // render skybox at last separately
-    sceneDepthBuffer->bind();
-    skybox->render();
-    sceneDepthBuffer->unbind();
-    _renderToScreenWithFog();
 }
 
-void Context::_renderToDepthMap() {
+void Context::_renderToShadowFramebuffer() {
     if (!useShadow)
         return;
 
     depthMap->bind();
-    renderToDepthMap = true;
+    isRenderingToDepthMap = true;
     glViewport(0, 0, depthMap->width, depthMap->height);
     glClear(GL_DEPTH_BUFFER_BIT);
-    _drawScene();
+    terrain->render();
+    // water->render();
     depthMap->unbind();
-    renderToDepthMap = false;
+    isRenderingToDepthMap = false;
 }
 
-void Context::_renderToScreen() {
-    assert(!renderToDepthMap);
+void Context::_renderToFogFramebuffer() {
+    if (!renderFog)
+        return;
+
     sceneDepthBuffer->bind();
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    _drawScene();
+    terrain->render();
+    water->render();
+    skybox->render();
     sceneDepthBuffer->unbind();
 }
 
-void Context::_renderToWater() {
+void Context::_renderToWaterFramebuffer() {
+    if (!renderWater)
+        return;
+
     glEnable(GL_CLIP_DISTANCE0);
     bool tempShowGround = terrain->showGround;
     terrain->showGround = false;
@@ -125,7 +128,7 @@ void Context::_renderToWater() {
     water->reflectionBuffer->bind();
     glViewport(0, 0, water->reflectionBuffer->width, water->reflectionBuffer->height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    renderReflection = true;
+    isRenderingReflection = true;
     // flip camera
     float distance = 2.0f * (camera->position.y - water->waterLevel);
     camera->position.y -= distance;
@@ -141,7 +144,7 @@ void Context::_renderToWater() {
     water->refractionBuffer->bind();
     glViewport(0, 0, water->refractionBuffer->width, water->refractionBuffer->height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    renderReflection = false;
+    isRenderingReflection = false;
     terrain->render();
     skybox->render();
     water->refractionBuffer->unbind();
@@ -149,23 +152,35 @@ void Context::_renderToWater() {
     terrain->showGround = tempShowGround;
 }
 
-void Context::_renderToScreenWithFog() {
-    glDisable(GL_DEPTH_TEST);
+void Context::_renderToScreen() {
     glViewport(0, 0, width, height);
-    fog->render();
-    glEnable(GL_DEPTH_TEST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    bool isPostProcessing = useAntiAliasing || renderFog;
+    if (isPostProcessing) {
+        if (useAntiAliasing) {
+            glDisable(GL_DEPTH_TEST);
+            glEnable(GL_DEPTH_TEST);
+        }
+        else if (renderFog) {
+            glDisable(GL_DEPTH_TEST);
+            fog->render();
+            glEnable(GL_DEPTH_TEST);
+        }
+        return;
+    }
+
+    terrain->render();
+    water->render();
+    skybox->render();
 }
 
 glm::vec4 Context::getClipPlane() {
-    if (renderReflection)
+    if (isRenderingReflection)
         return glm::vec4(0.0f, 1.0f, 0.0f, -water->waterLevel);
     else
         return glm::vec4(0.0f, -1.0f, 0.0f, water->waterLevel);
-}
-
-void Context::_drawScene() {
-    terrain->render();
-    water->render();
 }
 
 void Context::renderGUI() {
@@ -174,11 +189,17 @@ void Context::renderGUI() {
             if (ImGui::TreeNode("Rendering Mode")) {
                 if (ImGui::RadioButton("Fill", !wireFrameMode)) {
                     wireFrameMode = false;
+                    renderFog = renderFogSaved;
+                    useAntiAliasing = useAntiAliasingSaved;
                     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 }
                 ImGui::SameLine();
                 if (ImGui::RadioButton("Wireframe", wireFrameMode)) {
                     wireFrameMode = true;
+                    renderFogSaved = renderFog;
+                    useAntiAliasingSaved = useAntiAliasing;
+                    renderFog = false;  // disable post-processing
+                    useAntiAliasing = false;  // disable post-processing
                     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                 }
                 ImGui::TreePop();
@@ -209,6 +230,7 @@ void Context::renderGUI() {
         }
 
         if (ImGui::CollapsingHeader("Terrain")) {
+            ImGui::Checkbox("render terrain", &renderTerrain);
             ImGui::Checkbox("show ground", &terrain->showGround);
             ImGui::SliderFloat("height offset", &terrain->heightOffset, -5.0f, 5.0f);
             ImGui::SliderFloat("height scale", &terrain->heightScale, 0.0f, 100.0f);
@@ -220,7 +242,8 @@ void Context::renderGUI() {
         }
 
         if (ImGui::CollapsingHeader("Water")) {
-            ImGui::Checkbox("use DUDV", &useDUDV);
+            ImGui::Checkbox("render water", &renderWater);
+            ImGui::Checkbox("use DUDV", &water->useDUDV);
             ImGui::SliderFloat("water level", &water->waterLevel, 0.0f, 20.0f);
             ImGui::SliderFloat("water size", &water->waterSize, 10.0f, 100.0f);
             ImGui::SliderFloat("wave speed", &water->WAVE_SPEED, 0.0f, 0.2f);
@@ -228,6 +251,7 @@ void Context::renderGUI() {
         }
 
         if (ImGui::CollapsingHeader("Fog")) {
+            ImGui::Checkbox("render fog", &renderFog);
             ImGui::SliderFloat("fog density", &fog->fogDensity, 0.0f, 10000.0f);
         }
     }
