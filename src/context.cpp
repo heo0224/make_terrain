@@ -206,6 +206,7 @@ void Context::renderGUI() {
             }
 
             if (ImGui::TreeNode("Lighting")) {
+                ImGui::Checkbox("show light direction", &showLightDirection);
                 if (ImGui::SliderFloat("azimuth", &light->azimuth, 0.0f, 360.0f))
                     light->updateLightDir();
                 if (ImGui::SliderFloat("elevation", &light->elevation, 0.0f, 90.0f))
@@ -232,6 +233,10 @@ void Context::renderGUI() {
         if (ImGui::CollapsingHeader("Terrain")) {
             ImGui::Checkbox("render terrain", &renderTerrain);
             ImGui::Checkbox("show ground", &terrain->showGround);
+            ImGui::SameLine();
+            ImGui::Checkbox("use lighting", &terrain->useLighting);
+            ImGui::SameLine();
+            ImGui::Checkbox("show normals", &terrain->showNormals);
             ImGui::SliderFloat("height offset", &terrain->heightOffset, -5.0f, 5.0f);
             ImGui::SliderFloat("height scale", &terrain->heightScale, 0.0f, 100.0f);
             ImGui::SliderFloat("horizontal scale", &terrain->horizontalScale, 1.0f, 100.0f);
@@ -239,6 +244,7 @@ void Context::renderGUI() {
             ImGui::SliderInt("max tess level", &terrain->maxTessLevel, terrain->minTessLevel + 1, 64);
             ImGui::SliderFloat("min distance", &terrain->minDistance, 1.0f, terrain->maxDistance);
             ImGui::SliderFloat("max distance", &terrain->maxDistance, terrain->minDistance, 100.0f);
+            ImGui::SliderFloat("ambient strength", &terrain->ambientStrength, 0.0f, 1.0f);
         }
 
         if (ImGui::CollapsingHeader("Water")) {
@@ -257,43 +263,40 @@ void Context::renderGUI() {
     }
     ImGui::End();
 
-    /*
-    }
-    ImGui::End();
+    // ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
+    // if (ImGui::Begin("Depth Map")) {
+    //     ImVec2 contentSize = ImGui::GetContentRegionAvail();
+    //     int newWidth = (int)contentSize.x;
+    //     int newHeight = (int)contentSize.y;
 
-    ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
-    if (ImGui::Begin("Depth Map")) {
-        ImVec2 contentSize = ImGui::GetContentRegionAvail();
-        int newWidth = (int)contentSize.x;
-        int newHeight = (int)contentSize.y;
+    //     // resize the framebuffer if needed
+    //     if (newWidth != sceneBuffer->width || newHeight != sceneBuffer->height) {
+    //         newWidth = newWidth > 0 ? newWidth : 1;   // Avoid zero size
+    //         newHeight = newHeight > 0 ? newHeight : 1;
+    //         sceneBuffer->resizeFramebuffer(newWidth, newHeight);
+    //     }
 
-        // resize the framebuffer if needed
-        if (newWidth != sceneBuffer->width || newHeight != sceneBuffer->height) {
-            newWidth = newWidth > 0 ? newWidth : 1;   // Avoid zero size
-            newHeight = newHeight > 0 ? newHeight : 1;
-            sceneBuffer->resizeFramebuffer(newWidth, newHeight);
-        }
+    //     // render the scene to the framebuffer
+    //     sceneBuffer->bind();
+    //     glViewport(0, 0, sceneBuffer->width, sceneBuffer->height);
+    //     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //     depthQuadShader->use();
+    //     depthQuadShader->bindTexture("depthMap", depthMap.get());
+    //     glBindVertexArray(quadVAO);
+    //     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //     glBindVertexArray(0);
+    //     sceneBuffer->unbind();
 
-        // render the scene to the framebuffer
-        sceneBuffer->bind();
-        glViewport(0, 0, sceneBuffer->width, sceneBuffer->height);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        depthQuadShader->use();
-        depthQuadShader->bindTexture("depthMap", depthMap.get());
-        glBindVertexArray(quadVAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-        sceneBuffer->unbind();
+    //     // display the framebuffer texture
+    //     ImGui::Image(
+    //         (ImTextureID)sceneBuffer->texture,
+    //         contentSize,
+    //         ImVec2(0.0f, 1.0f),
+    //         ImVec2(1.0f, 0.0f)
+    //     );
+    // }
+    // ImGui::End();
 
-        // display the framebuffer texture
-        ImGui::Image(
-            (ImTextureID)sceneBuffer->texture,
-            contentSize,
-            ImVec2(0.0f, 1.0f),
-            ImVec2(1.0f, 0.0f)
-        );
-    }
-    */
     /*
      ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
      if (ImGui::Begin("Reflection")) {

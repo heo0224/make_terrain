@@ -25,6 +25,13 @@ void Terrain::init() {
         "../shaders/terrain/shader_terrain.tesc",
         "../shaders/terrain/shader_terrain.tese"
     );
+    normalShader = std::make_unique<Shader>(
+        "../shaders/terrain/shader_terrain.vs",
+        "../shaders/debug/shader_terrain_normal.fs",
+        "../shaders/debug/shader_terrain_normal.gs",
+        "../shaders/terrain/shader_terrain.tesc",
+        "../shaders/terrain/shader_terrain.tese"
+    );
     heightMap = std::make_unique<Texture>("../assets/Rolling Hills Height Map 1k/converted/Rolling Hills Height Map.png");
     diffuseMap = std::make_unique<Texture>("../assets/Rolling Hills Height Map 1k/converted/Rolling Hills Bitmap 1025.png");
 
@@ -83,11 +90,13 @@ void Terrain::render() {
     );
     glm::mat4 view = context->getViewMatrix();
     glm::mat4 projection = context->getProjectionMatrix();
+    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
 
     shader->use();
     shader->setMat4("model", model);
     shader->setMat4("view", view);
     shader->setMat4("projection", projection);
+    shader->setMat3("normalMatrix", normalMatrix);
 
     // terrain
     shader->bindTexture("heightMap", heightMap.get(), 0);
@@ -101,6 +110,8 @@ void Terrain::render() {
     shader->setBool("showGround", showGround);
 
     // light
+    shader->setBool("useLighting", useLighting);
+    shader->setFloat("ambientStrength", ambientStrength);
     shader->setVec3("lightDir", context->light->direction);
     shader->setMat4("lightSpaceMatrix", context->light->getLightSpaceMatrix());
 
@@ -119,4 +130,25 @@ void Terrain::render() {
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_PATCHES, 0, 4 * numStrips * numStrips);
+
+    // debug: show normals or light direction
+    if (showNormals || context->showLightDirection) {
+        normalShader->use();
+        normalShader->setMat4("model", model);
+        normalShader->setMat4("view", view);
+        normalShader->setMat4("projection", projection);
+        normalShader->setMat3("normalMatrix", normalMatrix);
+        normalShader->bindTexture("heightMap", heightMap.get(), 0);
+        normalShader->setFloat("heightScale", heightScale);
+        normalShader->setFloat("heightOffset", heightOffset);
+        normalShader->setInt("minTessLevel", minTessLevel);
+        normalShader->setInt("maxTessLevel", maxTessLevel);
+        normalShader->setFloat("minDistance", minDistance);
+        normalShader->setFloat("maxDistance", maxDistance);
+        normalShader->setBool("showNormals", showNormals);
+        normalShader->setBool("showLightDirection", context->showLightDirection);
+        normalShader->setVec3("lightDir", context->light->direction);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_PATCHES, 0, 4 * numStrips * numStrips);
+    }
 }
