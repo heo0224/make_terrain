@@ -32,11 +32,20 @@ void Terrain::init() {
         "../shaders/terrain/shader_terrain.tesc",
         "../shaders/terrain/shader_terrain.tese"
     );
-    heightMap = std::make_unique<Texture>("../assets/Rolling Hills Height Map 1k/converted/Rolling Hills Height Map.png");
-    diffuseMap = std::make_unique<Texture>("../assets/Rolling Hills Height Map 1k/converted/Rolling Hills Bitmap 1025.png");
+
+    resetTerrain("Rolling Hills Height Map 1k");
+    SPDLOG_INFO("Terrain initialized");
+}
+
+void Terrain::resetTerrain(const std::string& terrainDir) {
+    heightMap = std::make_unique<Texture>(("../assets/Terrain/" + terrainDir + "/converted/Height Map.png").c_str());
+    diffuseMap = std::make_unique<Texture>(("../assets/Terrain/" + terrainDir + "/converted/Diffuse Map.png").c_str());
 
     int width = heightMap->width;
     int height = heightMap->height;
+    numStrips = width / 50;
+
+    vertices.clear();
     for (unsigned i = 0; i < numStrips; i++)
     {
         for (unsigned j = 0; j < numStrips; j++)
@@ -70,13 +79,15 @@ void Terrain::init() {
             vertices.push_back((j + 1) / (float)numStrips); // v
         }
     }
+
+    if (VAO != 0) {
+        glDeleteVertexArrays(1, &VAO);
+    }
     VAO = generatePositionTextureVAO(vertices);
-    SPDLOG_INFO("Terrain initialized");
+    SPDLOG_INFO("Terrain reset: {}", terrainDir);
+    SPDLOG_INFO("Terrain width: {}, height: {}, numStrips: {}", width, height, numStrips);
 }
 
-void Terrain::resetVertices() {
-    vertices.clear();
-}
 
 void Terrain::render() {
     if (!context->renderTerrain)
