@@ -32,7 +32,7 @@ void main()
     vec3 color = fs_in.color;
     float shadow = calculateShadow(fs_in.fragPosLightSpace);
     if (!useLighting) {
-        fragColor = vec4(color * (1.0 - shadow), 1.0);
+        fragColor = vec4(ambientStrength * color + color * (1.0 - ambientStrength) * (1.0 - shadow), 1.0);
         return;
     }
 
