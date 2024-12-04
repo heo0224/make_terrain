@@ -34,6 +34,7 @@ private:
     bool initWithColorAndDepthAttachment(int width, int height);
     unsigned int FBO;
     unsigned int RBO;
+    AttachmentType type;
 };
 
 #endif // __FRAMEBUFFER_H__
