@@ -72,6 +72,7 @@ private:
     bool renderFogSaved = true;
     bool useAntiAliasing = false;
     bool useAntiAliasingSaved = false;
+    bool showLightDirection = false;
 
     // shadow mapping
     bool useShadow = false;
