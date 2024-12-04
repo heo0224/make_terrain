@@ -12,7 +12,7 @@ public:
     static std::unique_ptr<Terrain> createWithTessellation(Context* context);
     static std::unique_ptr<Terrain> createWithoutTessellation(Context* context);
     void render();
-    void resetVertices();
+    void resetTerrain(const std::string& terrainDir);
 
     float heightScale = 9.0f;
     float heightOffset = 0.0f;

@@ -61,6 +61,8 @@ private:
     float lastY = WINDOW_HEIGHT / 2.0f;
     float deltaTime = 0.0f;
     float lastTime = 0.0f;
+    std::vector<std::string> terrainDirs;
+    int currentTerrainIdx = -1;
 
     // flags
     bool isRenderingToDepthMap = false;

@@ -1,7 +1,10 @@
 #include "context.h"
 #include "utils.h"
 #include "geometry_primitives.h"
+#include <filesystem>
 #include <imgui.h>
+
+namespace fs = std::filesystem;
 
 std::unique_ptr<Context> Context::create() {
     auto context = std::unique_ptr<Context>(new Context());
@@ -30,6 +33,13 @@ bool Context::init() {
         "../shaders/shader_fxaa.fs"
     );
 
+    // load terrain directories
+    fs::path baseDir = "../assets/Terrain";
+    for (const auto& entry : fs::directory_iterator(baseDir)) {
+        if (fs::is_directory(entry)) {
+            terrainDirs.push_back(entry.path().filename().string());
+        }
+    }
     return true;
 }
 
@@ -217,6 +227,20 @@ glm::vec4 Context::getClipPlane() {
 
 void Context::renderGUI() {
     if (ImGui::Begin("UI Window Example")) {
+        if (ImGui::BeginCombo("Terrain Selection", terrainDirs[currentTerrainIdx].c_str())) {
+            for (int i = 0; i < terrainDirs.size(); i++) {
+                bool isSelected = (currentTerrainIdx == i);
+                if (ImGui::Selectable(terrainDirs[i].c_str(), isSelected)) {
+                    currentTerrainIdx = i;
+                    SPDLOG_INFO("Selected terrain: {}", terrainDirs[i]);
+                    terrain->resetTerrain(terrainDirs[i]);
+                }
+                if (isSelected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+
         if (ImGui::TreeNode("Rendering Mode")) {
             if (ImGui::RadioButton("Fill", !wireFrameMode)) {
                 wireFrameMode = false;
