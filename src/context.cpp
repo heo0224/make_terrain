@@ -51,9 +51,13 @@ void Context::processInput(GLFWwindow* window) {
 }
 
 void Context::reshape(int width, int height) {
+    // resize the viewport
     this->width = width;
     this->height = height;
     glViewport(0, 0, width, height);
+
+    // resize the framebuffers for post-processing
+    sceneDepthBuffer->resizeFramebuffer(width, height);
 }
 
 void Context::mouseMove(double x, double y) {
