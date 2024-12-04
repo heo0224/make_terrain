@@ -71,18 +71,18 @@ private:
     bool renderTerrain = true;
     bool renderWater = true;
     bool renderFog = true;
-    bool renderFogSaved = true;
-    bool useAntiAliasing = false;
-    bool useAntiAliasingSaved = false;
+    bool renderFogSaved = renderFog;
+    bool useAntiAliasing = true;
+    bool useAntiAliasingSaved = useAntiAliasing;
     bool showLightDirection = false;
 
     // shadow mapping
-    bool useShadow = false;
-    bool usePCF = false;
-    float minShadowBias = 0.005f;
-    float maxShadowBias = 0.01f;
-    int numPCFSamples = 8;
-    float PCFSpreadness = 1.0f / 3000.0f;
+    bool useShadow = true;
+    bool usePCF = true;
+    float minShadowBias = 0.00015f;
+    float maxShadowBias = 0.00045f;
+    int numPCFSamples = 32;
+    float PCFSpreadness = 0.0025;
 
     // anti-aliasing (FXAA)
     float lumaThreshold = 0.5f;

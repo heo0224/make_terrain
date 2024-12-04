@@ -18,14 +18,14 @@ public:
     float heightOffset = 0.0f;
     float horizontalScale = 30.0f;
     int numStrips = 20;
-    int minTessLevel = 2;
-    int maxTessLevel = 16;
+    int minTessLevel = 45;
+    int maxTessLevel = 60;
     float minDistance = 1.0f;
     float maxDistance = 10.0f;
     bool showGround = true;
     bool showNormals = false;
     bool useLighting = false;
-    float ambientStrength = 0.5f;
+    float ambientStrength = 0.7f;
 
 private:
     Terrain(Context* context) : context(context) {};
