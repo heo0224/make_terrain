@@ -18,8 +18,8 @@ void Fog::init() {
 void Fog::render() {
     fogShader->use();
     glBindVertexArray(screenQuadVAO);
-    fogShader->bindTexture("sceneBuffer", context->sceneDepthBuffer->colorTexture, 0);
-    fogShader->bindTexture("depthMap", context->sceneDepthBuffer->depthTexture, 1);
+    fogShader->bindTexture("sceneBuffer", context->fogScreenBuffer->colorTexture, 0);
+    fogShader->bindTexture("depthMap", context->fogScreenBuffer->depthTexture, 1);
     // fogShader->bindTexture("depthMap", context->depthMap.get(), 1);
 
     fogShader->setVec3("fogColor", fogColor);

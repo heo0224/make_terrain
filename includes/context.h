@@ -19,6 +19,7 @@ public:
     void _renderToShadowFramebuffer();
     void _renderToFogFramebuffer();
     void _renderToWaterFramebuffer();
+    void _renderToAntiAliasingScreenBuffer();
     void _renderToScreen();
     void renderGUI();
     void updateDeltaTime();
@@ -47,10 +48,11 @@ private:
     std::unique_ptr<Water> water;
     std::unique_ptr<Fog> fog;
     std::unique_ptr<Framebuffer> depthMap;
-    std::unique_ptr<Framebuffer> sceneBuffer;
-    std::unique_ptr<Framebuffer> sceneDepthBuffer;
+    std::unique_ptr<Framebuffer> fogScreenBuffer;
+    std::unique_ptr<Framebuffer> antiAliasingScreenBuffer;
     std::unique_ptr<Shader> depthQuadShader;
-    unsigned int quadVAO;
+    std::unique_ptr<Shader> FXAAShader;
+    unsigned int screenQuadVAO;
 
     int width = WINDOW_WIDTH;
     int height = WINDOW_HEIGHT;
@@ -81,6 +83,12 @@ private:
     float maxShadowBias = 0.01f;
     int numPCFSamples = 8;
     float PCFSpreadness = 1.0f / 3000.0f;
+
+    // anti-aliasing (FXAA)
+    float lumaThreshold = 0.5f;
+    float mulReduce = 1.0f / 8.0f;
+    float minReduce = 1.0f / 128.0f;
+    float maxSpan = 8.0f;
 };
 
 inline glm::mat4 Context::getModelMatrix(glm::vec3 transl, glm::vec3 axis, float angleInDeg, glm::vec3 scale) {

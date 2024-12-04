@@ -18,12 +18,16 @@ bool Context::init() {
     water = std::make_unique<Water>(this);
     fog = std::make_unique<Fog>(this);
     depthMap = Framebuffer::create(1024, 1024, AttachmentType::DEPTH);
-    sceneBuffer = Framebuffer::create(width, height, AttachmentType::COLOR);
-    sceneDepthBuffer = Framebuffer::create(width, height, AttachmentType::COLOR_AND_DEPTH);
-    quadVAO = generatePositionTextureVAOWithEBO(quadPositionTextures, sizeof(quadPositionTextures), quadIndices, sizeof(quadIndices));
+    antiAliasingScreenBuffer = Framebuffer::create(width, height, AttachmentType::COLOR);
+    fogScreenBuffer = Framebuffer::create(width, height, AttachmentType::COLOR_AND_DEPTH);
+    screenQuadVAO = generatePositionTextureVAO(screenQuadVertices, sizeof(screenQuadVertices));
     depthQuadShader = std::make_unique<Shader>(
         "../shaders/debug/shader_depth_quad.vs",
         "../shaders/debug/shader_depth_quad.fs"
+    );
+    FXAAShader = std::make_unique<Shader>(
+        "../shaders/shader_fxaa.vs",
+        "../shaders/shader_fxaa.fs"
     );
 
     return true;
@@ -57,7 +61,8 @@ void Context::reshape(int width, int height) {
     glViewport(0, 0, width, height);
 
     // resize the framebuffers for post-processing
-    sceneDepthBuffer->resizeFramebuffer(width, height);
+    fogScreenBuffer->resizeFramebuffer(width, height);
+    antiAliasingScreenBuffer->resizeFramebuffer(width, height);
 }
 
 void Context::mouseMove(double x, double y) {
@@ -87,6 +92,7 @@ void Context::render() {
     _renderToShadowFramebuffer();
     _renderToWaterFramebuffer();
     _renderToFogFramebuffer();
+    _renderToAntiAliasingScreenBuffer();
     _renderToScreen();
 }
 
@@ -102,19 +108,6 @@ void Context::_renderToShadowFramebuffer() {
     // water->render();
     depthMap->unbind();
     isRenderingToDepthMap = false;
-}
-
-void Context::_renderToFogFramebuffer() {
-    if (!renderFog)
-        return;
-
-    sceneDepthBuffer->bind();
-    glViewport(0, 0, width, height);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    terrain->render();
-    water->render();
-    skybox->render();
-    sceneDepthBuffer->unbind();
 }
 
 void Context::_renderToWaterFramebuffer() {
@@ -152,15 +145,54 @@ void Context::_renderToWaterFramebuffer() {
     terrain->showGround = tempShowGround;
 }
 
-void Context::_renderToScreen() {
+void Context::_renderToFogFramebuffer() {
+    if (!renderFog)
+        return;
+
+    fogScreenBuffer->bind();
     glViewport(0, 0, width, height);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    terrain->render();
+    water->render();
+    skybox->render();
+    fogScreenBuffer->unbind();
+}
+
+void Context::_renderToAntiAliasingScreenBuffer() {
+    if (!useAntiAliasing)
+        return;
+
+    antiAliasingScreenBuffer->bind();
+    glViewport(0, 0, width, height);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (renderFog)
+        fog->render();
+    else {
+        terrain->render();
+        water->render();
+        skybox->render();
+    }
+    antiAliasingScreenBuffer->unbind();
+}
+
+void Context::_renderToScreen() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     bool isPostProcessing = useAntiAliasing || renderFog;
     if (isPostProcessing) {
         if (useAntiAliasing) {
             glDisable(GL_DEPTH_TEST);
+            glBindVertexArray(screenQuadVAO);
+            FXAAShader->use();
+            FXAAShader->bindTexture("screenTexture", antiAliasingScreenBuffer.get());
+            FXAAShader->setVec2("u_texelStep", glm::vec2(1.0f / width, 1.0f / height));
+            FXAAShader->setFloat("u_lumaThreshold", 0.5f);
+            FXAAShader->setFloat("u_mulReduce", 1.0f / 8.0f);
+            FXAAShader->setFloat("u_minReduce", 1.0f / 128.0f);
+            FXAAShader->setFloat("u_maxSpan", 8.0f);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
             glEnable(GL_DEPTH_TEST);
         }
         else if (renderFog) {
@@ -185,49 +217,56 @@ glm::vec4 Context::getClipPlane() {
 
 void Context::renderGUI() {
     if (ImGui::Begin("UI Window Example")) {
-        if (ImGui::CollapsingHeader("Rendering")) {
-            if (ImGui::TreeNode("Rendering Mode")) {
-                if (ImGui::RadioButton("Fill", !wireFrameMode)) {
-                    wireFrameMode = false;
-                    renderFog = renderFogSaved;
-                    useAntiAliasing = useAntiAliasingSaved;
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                }
-                ImGui::SameLine();
-                if (ImGui::RadioButton("Wireframe", wireFrameMode)) {
-                    wireFrameMode = true;
-                    renderFogSaved = renderFog;
-                    useAntiAliasingSaved = useAntiAliasing;
-                    renderFog = false;  // disable post-processing
-                    useAntiAliasing = false;  // disable post-processing
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                }
-                ImGui::TreePop();
+        if (ImGui::TreeNode("Rendering Mode")) {
+            if (ImGui::RadioButton("Fill", !wireFrameMode)) {
+                wireFrameMode = false;
+                renderFog = renderFogSaved;
+                useAntiAliasing = useAntiAliasingSaved;
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             }
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Wireframe", wireFrameMode)) {
+                wireFrameMode = true;
+                renderFogSaved = renderFog;
+                useAntiAliasingSaved = useAntiAliasing;
+                renderFog = false;  // disable post-processing
+                useAntiAliasing = false;  // disable post-processing
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            }
+            ImGui::TreePop();
+        }
 
-            if (ImGui::TreeNode("Lighting")) {
-                ImGui::Checkbox("show light direction", &showLightDirection);
-                if (ImGui::SliderFloat("azimuth", &light->azimuth, 0.0f, 360.0f))
-                    light->updateLightDir();
-                if (ImGui::SliderFloat("elevation", &light->elevation, 0.0f, 90.0f))
-                    light->updateLightDir();
-                ImGui::SliderFloat("frustum size", &light->frustumSize, 10.0f, 10000.0f);
-                ImGui::SliderFloat("near plane", &light->nearPlane, 0.1f, light->farPlane - 0.1f);
-                ImGui::SliderFloat("far plane", &light->farPlane, light->nearPlane + 0.1f, 1000.0f);
-                ImGui::SliderFloat("light distance", &light->lightDistance, 0.5f, 500.0f);
-                ImGui::TreePop();
-            }
+        if (ImGui::TreeNode("Anti-Aliasing")) {
+            ImGui::Checkbox("use anti-aliasing", &useAntiAliasing);
+            ImGui::SliderFloat("luma threshold", &lumaThreshold, 0.01f, 0.6f);
+            ImGui::SliderFloat("mul reduce", &mulReduce, 1.0 / 16.0, 1.0 / 4.0);
+            ImGui::SliderFloat("min reduce", &minReduce, 1.0 / 256.0, 1.0 / 4.0);
+            ImGui::SliderFloat("max span", &maxSpan, 4.0f, 16.0f);
+            ImGui::TreePop();
+        }
 
-            if (ImGui::TreeNode("Shadow Mapping")) {
-                ImGui::Checkbox("use shadow", &useShadow);
-                ImGui::SameLine();
-                ImGui::Checkbox("use PCF", &usePCF);
-                ImGui::SliderFloat("min shadow bias", &minShadowBias, 0.001f, maxShadowBias - 0.001f);
-                ImGui::SliderFloat("max shadow bias", &maxShadowBias, minShadowBias + 0.001f, 0.1f);
-                ImGui::SliderInt("num PCF samples", &numPCFSamples, 1, 16);
-                ImGui::SliderFloat("PCF spreadness", &PCFSpreadness, 1.0 / 50000.0f, 1.0 / 500.0f, "%.5f");
-                ImGui::TreePop();
-            }
+        if (ImGui::TreeNode("Lighting")) {
+            ImGui::Checkbox("show light direction", &showLightDirection);
+            if (ImGui::SliderFloat("azimuth", &light->azimuth, 0.0f, 360.0f))
+                light->updateLightDir();
+            if (ImGui::SliderFloat("elevation", &light->elevation, 0.0f, 90.0f))
+                light->updateLightDir();
+            ImGui::SliderFloat("frustum size", &light->frustumSize, 10.0f, 10000.0f);
+            ImGui::SliderFloat("near plane", &light->nearPlane, 0.1f, light->farPlane - 0.1f);
+            ImGui::SliderFloat("far plane", &light->farPlane, light->nearPlane + 0.1f, 1000.0f);
+            ImGui::SliderFloat("light distance", &light->lightDistance, 0.5f, 500.0f);
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Shadow Mapping")) {
+            ImGui::Checkbox("use shadow", &useShadow);
+            ImGui::SameLine();
+            ImGui::Checkbox("use PCF", &usePCF);
+            ImGui::SliderFloat("min shadow bias", &minShadowBias, 0.00001f, maxShadowBias - 0.00001f, "%.5f");
+            ImGui::SliderFloat("max shadow bias", &maxShadowBias, minShadowBias + 0.00001f, 0.1f, "%.5f");
+            ImGui::SliderInt("num PCF samples", &numPCFSamples, 1, 64);
+            ImGui::SliderFloat("PCF spreadness", &PCFSpreadness, 1.0 / 50000.0f, 1.0 / 100.0f, "%.5f");
+            ImGui::TreePop();
         }
 
         if (ImGui::CollapsingHeader("Terrain")) {
