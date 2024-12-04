@@ -20,6 +20,9 @@ void Water::init() {
 }
 
 void Water::render() {
+    if (!context->renderWater)
+        return;
+
     waterShader->use();
     waterShader->bindTexture("reflectionTexture", reflectionBuffer.get(), 0);
     waterShader->bindTexture("refractionTexture", refractionBuffer.get(), 1);
@@ -33,7 +36,7 @@ void Water::render() {
     model = glm::translate(model, glm::vec3(0.0f, waterLevel, 0.0f));
     model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     waterShader->setMat4("model", model);
-    waterShader->setBool("useDUDV", context->useDUDV);
+    waterShader->setBool("useDUDV", useDUDV);
     float moveFactor = WAVE_SPEED * glfwGetTime();
     moveFactor = fmod(moveFactor, 1.0f);
     waterShader->setFloat("moveFactor", moveFactor);

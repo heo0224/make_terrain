@@ -16,9 +16,10 @@ class Context {
 public:
     static std::unique_ptr<Context> create();
     void render();
-    void _renderToDepthMap();
+    void _renderToShadowFramebuffer();
+    void _renderToFogFramebuffer();
+    void _renderToWaterFramebuffer();
     void _renderToScreen();
-    void _drawScene();
     void renderGUI();
     void updateDeltaTime();
     void processInput(GLFWwindow* window);
@@ -29,20 +30,12 @@ public:
     glm::mat4 getViewMatrix();
     glm::mat4 getProjectionMatrix();
     glm::vec3 getCameraPosition(); // added for Water class
+    glm::vec4 getClipPlane();
 
     friend class DirectionalLight;
     friend class Terrain;
     friend class Water;
     friend class Fog;
-    //water
-    void _renderToWater();
-    bool renderReflection = false;
-    bool useDUDV = true;
-    unsigned int waterVAO;
-    glm::vec4 getClipPlane();
-
-    // fog
-    void _renderToScreenWithFog();
 private:
     Context() {};
     bool init();
@@ -51,6 +44,8 @@ private:
     std::unique_ptr<DirectionalLight> light;
     std::unique_ptr<Terrain> terrain;
     std::unique_ptr<Skybox> skybox;
+    std::unique_ptr<Water> water;
+    std::unique_ptr<Fog> fog;
     std::unique_ptr<Framebuffer> depthMap;
     std::unique_ptr<Framebuffer> sceneBuffer;
     std::unique_ptr<Framebuffer> sceneDepthBuffer;
@@ -64,16 +59,21 @@ private:
     float lastY = WINDOW_HEIGHT / 2.0f;
     float deltaTime = 0.0f;
     float lastTime = 0.0f;
+
+    // flags
+    bool isRenderingToDepthMap = false;
+    bool isRenderingReflection = false;
+
+    // rendering options
     bool wireFrameMode = false;
-
-    //water
-    std::unique_ptr<Water> water;
-
-    //fog
-    std::unique_ptr<Fog> fog;
+    bool renderTerrain = true;
+    bool renderWater = true;
+    bool renderFog = true;
+    bool renderFogSaved = true;
+    bool useAntiAliasing = false;
+    bool useAntiAliasingSaved = false;
 
     // shadow mapping
-    bool renderToDepthMap = false;
     bool useShadow = false;
     bool usePCF = false;
     float minShadowBias = 0.005f;
