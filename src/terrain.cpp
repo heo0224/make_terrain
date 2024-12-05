@@ -38,6 +38,10 @@ void Terrain::init() {
 }
 
 void Terrain::resetTerrain(const std::string& terrainDir) {
+    if (VAO != 0) {
+        glDeleteVertexArrays(1, &VAO);
+    }
+
     heightMap = std::make_unique<Texture>(("../assets/Terrain/" + terrainDir + "/converted/Height Map.png").c_str());
     diffuseMap = std::make_unique<Texture>(("../assets/Terrain/" + terrainDir + "/converted/Diffuse Map.png").c_str());
 
@@ -80,9 +84,6 @@ void Terrain::resetTerrain(const std::string& terrainDir) {
         }
     }
 
-    if (VAO != 0) {
-        glDeleteVertexArrays(1, &VAO);
-    }
     VAO = generatePositionTextureVAO(vertices);
     SPDLOG_INFO("Terrain reset: {}", terrainDir);
     SPDLOG_INFO("Terrain width: {}, height: {}, numStrips: {}", width, height, numStrips);
