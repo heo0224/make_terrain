@@ -313,6 +313,9 @@ void Context::renderGUI() {
         if (ImGui::CollapsingHeader("Water")) {
             ImGui::Checkbox("render water", &renderWater);
             ImGui::Checkbox("use DUDV", &water->useDUDV);
+            ImGui::Checkbox("specular", &water->specular);
+            ImGui::SameLine();
+            ImGui::Checkbox("use normal map", &water->useNormalMap);
             ImGui::SliderFloat("water level", &water->waterLevel, 0.0f, 20.0f);
             ImGui::SliderFloat("wave speed", &water->WAVE_SPEED, 0.0f, 0.2f);
             ImGui::SliderFloat("tiling factor", &water->tiling, 1.0f, 10.0f);
