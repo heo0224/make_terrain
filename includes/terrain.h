@@ -12,17 +12,20 @@ public:
     static std::unique_ptr<Terrain> createWithTessellation(Context* context);
     static std::unique_ptr<Terrain> createWithoutTessellation(Context* context);
     void render();
-    void resetVertices();
+    void resetTerrain(const std::string& terrainDir);
 
     float heightScale = 9.0f;
     float heightOffset = 0.0f;
-    float horizontalScale = 0.03f;
+    float horizontalScale = 30.0f;
     int numStrips = 20;
-    int minTessLevel = 2;
-    int maxTessLevel = 16;
+    int minTessLevel = 45;
+    int maxTessLevel = 60;
     float minDistance = 1.0f;
     float maxDistance = 10.0f;
     bool showGround = true;
+    bool showNormals = false;
+    bool useLighting = false;
+    float ambientStrength = 0.7f;
 
 private:
     Terrain(Context* context) : context(context) {};
@@ -30,9 +33,10 @@ private:
 
     Context* context;
     std::unique_ptr<Shader> shader;
+    std::unique_ptr<Shader> normalShader;
     std::unique_ptr<Texture> heightMap;
     std::unique_ptr<Texture> diffuseMap;
-    unsigned int VAO;
+    unsigned int VAO = 0;
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
 };

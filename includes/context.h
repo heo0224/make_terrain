@@ -10,14 +10,17 @@
 #include "light.h"
 #include "framebuffer.h"
 #include "water.h"
+#include "fog.h"
 
 class Context {
 public:
     static std::unique_ptr<Context> create();
     void render();
-    void _renderToDepthMap();
+    void _renderToShadowFramebuffer();
+    void _renderToFogFramebuffer();
+    void _renderToWaterFramebuffer();
+    void _renderToAntiAliasingScreenBuffer();
     void _renderToScreen();
-    void _drawScene();
     void renderGUI();
     void updateDeltaTime();
     void processInput(GLFWwindow* window);
@@ -28,15 +31,12 @@ public:
     glm::mat4 getViewMatrix();
     glm::mat4 getProjectionMatrix();
     glm::vec3 getCameraPosition(); // added for Water class
- 
+    glm::vec4 getClipPlane();
+
     friend class DirectionalLight;
     friend class Terrain;
-    //water
-    void _renderToWater();
-    bool renderReflection = false;
-    bool useDUDV = true;
-    unsigned int waterVAO;
-    glm::vec4 getClipPlane();
+    friend class Water;
+    friend class Fog;
 private:
     Context() {};
     bool init();
@@ -45,10 +45,14 @@ private:
     std::unique_ptr<DirectionalLight> light;
     std::unique_ptr<Terrain> terrain;
     std::unique_ptr<Skybox> skybox;
+    std::unique_ptr<Water> water;
+    std::unique_ptr<Fog> fog;
     std::unique_ptr<Framebuffer> depthMap;
-    std::unique_ptr<Framebuffer> sceneBuffer;
+    std::unique_ptr<Framebuffer> fogScreenBuffer;
+    std::unique_ptr<Framebuffer> antiAliasingScreenBuffer;
     std::unique_ptr<Shader> depthQuadShader;
-    unsigned int quadVAO;
+    std::unique_ptr<Shader> FXAAShader;
+    unsigned int screenQuadVAO;
 
     int width = WINDOW_WIDTH;
     int height = WINDOW_HEIGHT;
@@ -57,19 +61,36 @@ private:
     float lastY = WINDOW_HEIGHT / 2.0f;
     float deltaTime = 0.0f;
     float lastTime = 0.0f;
+    std::vector<std::string> terrainDirs;
+    int currentTerrainIdx = -1;
+
+    // flags
+    bool isRenderingToDepthMap = false;
+    bool isRenderingReflection = false;
+
+    // rendering options
     bool wireFrameMode = false;
- 
-    //water
-    std::unique_ptr<Water> water;
+    bool renderTerrain = true;
+    bool renderWater = true;
+    bool renderFog = true;
+    bool renderFogSaved = renderFog;
+    bool useAntiAliasing = true;
+    bool useAntiAliasingSaved = useAntiAliasing;
+    bool showLightDirection = false;
 
     // shadow mapping
-    bool renderToDepthMap = false;
-    bool useShadow = false;
-    bool usePCF = false;
-    float minShadowBias = 0.005f;
-    float maxShadowBias = 0.01f;
-    int numPCFSamples = 8;
-    float PCFSpreadness = 1.0f / 3000.0f;
+    bool useShadow = true;
+    bool usePCF = true;
+    float minShadowBias = 0.00015f;
+    float maxShadowBias = 0.00045f;
+    int numPCFSamples = 32;
+    float PCFSpreadness = 0.0025;
+
+    // anti-aliasing (FXAA)
+    float lumaThreshold = 0.5f;
+    float mulReduce = 1.0f / 8.0f;
+    float minReduce = 1.0f / 128.0f;
+    float maxSpan = 8.0f;
 };
 
 inline glm::mat4 Context::getModelMatrix(glm::vec3 transl, glm::vec3 axis, float angleInDeg, glm::vec3 scale) {

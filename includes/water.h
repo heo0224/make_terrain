@@ -8,12 +8,12 @@
 
 class Context;  // forward declaration
 
-class Water{
+class Water {
 public:
     Water(Context* context);
 
-    int width = 480; // Framebuffer width
-    int height = 480; // Framebuffer height
+    int width = 1024; // Framebuffer width
+    int height = 1024; // Framebuffer height
     std::unique_ptr<Framebuffer> reflectionBuffer;
     std::unique_ptr<Framebuffer> refractionBuffer;
     void render();
@@ -21,6 +21,7 @@ public:
     float waterLevel = 0.3f;
     float waterSize = 100.0f;
     float tiling = 10.0f;
+    bool useDUDV = true;
 private:
     void init();
     Context* context;

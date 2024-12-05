@@ -10,9 +10,11 @@ out vec4 fragColor;
 
 uniform sampler2D depthMap;
 uniform bool renderToDepthMap;
+uniform bool useLighting;
 uniform bool useShadow;
 uniform bool usePCF;
 uniform vec3 lightDir;
+uniform float ambientStrength;
 uniform float minShadowBias;
 uniform float maxShadowBias;
 uniform int numPCFSamples;
@@ -27,9 +29,16 @@ void main()
         return;
     }
 
+    vec3 color = fs_in.color;
     float shadow = calculateShadow(fs_in.fragPosLightSpace);
-    vec3 color = (1.0 - shadow) * fs_in.color;
-    fragColor = vec4(color, 1.0);
+    if (!useLighting) {
+        fragColor = vec4(ambientStrength * color + color * (1.0 - ambientStrength) * (1.0 - shadow), 1.0);
+        return;
+    }
+
+    vec3 ambient = ambientStrength * color;
+    vec3 diffuse = max(dot(normalize(fs_in.normal), -lightDir), 0.0) * color * (1.0 - ambientStrength);
+    fragColor = vec4(ambient + (1.0 - shadow) * diffuse, 1.0);
 }
 
 const vec2 poissonDisk[16] = vec2[]( 
@@ -62,7 +71,8 @@ float calculateShadow(vec4 fragPosLightSpace) {
 
     // calculate shadow
     float shadow = 0.0;
-    float bias = max(maxShadowBias * (1.0 - dot(fs_in.normal, -lightDir)), minShadowBias);
+    float diff = 1.0 - dot(normalize(fs_in.normal), -lightDir);
+    float bias = max(maxShadowBias * diff, minShadowBias);
     if (usePCF) {
         for (int i = 0; i < numPCFSamples; i++) {
             int idx = int(16.0 * random(floor(fragPosLightSpace.xyz * 1000.0), i)) % 16;
