@@ -11,7 +11,7 @@ public:
     Texture(const char* filePath);
 };
 
-class CubemapTexture{
+class CubemapTexture {
 public:
     unsigned int textureID;
     int width;
@@ -23,12 +23,12 @@ public:
 
 class DepthMapTexture {
 public:
-	unsigned int ID;
-	unsigned int depthMapFBO;
-	int width;
-	int height;
+    unsigned int ID;
+    unsigned int depthMapFBO;
+    int width;
+    int height;
 
-	DepthMapTexture(int shadow_width, int shadow_height);
+    DepthMapTexture(int shadow_width, int shadow_height);
 };
 
 #endif  // __TEXTURE_H__

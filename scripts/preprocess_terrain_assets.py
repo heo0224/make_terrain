@@ -1,55 +1,59 @@
-import argparse
 from pathlib import Path
 
 from PIL import Image
 
+# _ALLOWED_SIZES = [1024, 2048, 4096, 8192]
+_ALLOWED_SIZES = [1024, 2048]
+# _ALLOWED_SIZES = [1024]
+
 
 def main():
-    parser = argparse.ArgumentParser(description="Resize images in a directory.")
-    parser.add_argument("--asset_dir", type=Path, help="Target image to resize.")
-    parser.add_argument(
-        "--width", type=int, default=1024, help="Width of the resized images."
-    )
-    parser.add_argument(
-        "--height", type=int, default=1024, help="Height of the resized images."
-    )
-    args = parser.parse_args()
+    base_dir = Path(__file__).parent.parent / "assets" / "Terrain"
+    for asset_dir in base_dir.glob("*"):
+        if not asset_dir.is_dir():
+            continue
 
-    asset_dir = Path(args.asset_dir)
-    if not asset_dir.is_dir():
-        raise NotADirectoryError(f"Directory not found: {asset_dir}")
-
-    save_dir = asset_dir / "converted"
-    save_dir.mkdir(exist_ok=True, parents=True)
-    for img_path in asset_dir.glob("*.[pj][np][g]"):  # png or jpg
-        output_path = save_dir / img_path.name
-        preprocess_img(img_path, output_path, args.width, args.height)
+        print(f"Processing asset directory: {asset_dir}")
+        for img_path in asset_dir.glob("*.[pj][np][g]"):
+            preprocess_img(img_path)
 
 
-def preprocess_img(input_path, output_path, width=1024, height=1024):
-    print(f"Processing image: {input_path}")
+def preprocess_img(img_path):
+    print(f"Processing image: {img_path}")
     try:
-        with Image.open(input_path) as img:
+        with Image.open(img_path) as img:
             original_mode = img.mode
-            if original_mode not in ["L", "I", "RGB", "RGBA"]:
+            if original_mode not in ["L", "I", "P", "RGB", "RGBA"]:
                 raise ValueError(f"Unsupported image mode: {original_mode}")
 
-            resized_img = img.resize((width, height), Image.NEAREST)
+            # find the nearest allowed size
+            original_width, original_height = img.size
+            width = min(_ALLOWED_SIZES, key=lambda x: abs(x - original_width))
+            height = min(_ALLOWED_SIZES, key=lambda x: abs(x - original_height))
+
+            # preprocess the image
+            processed_img = img.resize((width, height), Image.NEAREST)
             if original_mode == "I":
                 print("  - Convert 32-bit grayscale to 8-bit grayscale")
-                min_val = resized_img.getextrema()[0]
-                max_val = resized_img.getextrema()[1]
-                resized_img = resized_img.point(
+                min_val = processed_img.getextrema()[0]
+                max_val = processed_img.getextrema()[1]
+                processed_img = processed_img.point(
                     lambda x: (x - min_val) / (max_val - min_val) * 255
                 )
             if original_mode in ["I", "L"]:
                 print("  - Convert grayscale to RGB image")
-                resized_img = resized_img.convert("RGB")
+                processed_img = processed_img.convert("RGB")
+            if original_mode == "P":
+                print("  - Convert palette image to RGB image")
+                processed_img = processed_img.convert("RGB")
 
-            resized_img.save(output_path, format="PNG")
-            print(f"  - Converted image saved to: {output_path}")
+            save_dir = img_path.parent / "converted"
+            save_dir.mkdir(exist_ok=True, parents=True)
+            save_path = save_dir / img_path.name
+            processed_img.save(save_path, format="PNG")
+            print(f"  - Converted image saved to: {save_path}")
             print(f"    - Original image size: {img.size}")
-            print(f"    - Resized image size: {resized_img.size}")
+            print(f"    - Resized image size: {processed_img.size}")
     except Exception as e:
         print(f"Error: {e}")
 

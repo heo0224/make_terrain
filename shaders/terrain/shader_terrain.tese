@@ -9,10 +9,10 @@ in TESC_OUT {
 out TESE_OUT {
     vec3 color;
     vec4 bottomPoint;
-    vec4 fragPosLightSpace;
-    vec3 normal;
     float clipDistance;
     float bottomClipDistance;
+    bool isCloseToBorder;
+    bool isAdjacentToBorder;
 } tese_out;
 
 uniform sampler2D heightMap;
@@ -20,27 +20,9 @@ uniform sampler2D diffuseMap;
 uniform float heightScale;
 uniform float heightOffset;
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-uniform mat4 lightSpaceMatrix;
-uniform bool renderToDepthMap;
 uniform vec4 clipPlane;
 
 const vec4 up = vec4(0.0, 1.0, 0.0, 0.0);
-
-vec3 getNormalFromHeightMap(sampler2D heightMap, vec2 texCoord) {
-    const vec2 size = vec2(2.0, 0.0);
-    const ivec3 off = ivec3(-1, 0, 1);
-
-    float height = texture(heightMap, texCoord).y * heightScale + heightOffset;
-    float leftHeight = textureOffset(heightMap, texCoord, off.xy).x * heightScale + heightOffset;
-    float rightHeight = textureOffset(heightMap, texCoord, off.zy).x * heightScale + heightOffset;
-    float bottomHeight = textureOffset(heightMap, texCoord, off.yx).x * heightScale + heightOffset;
-    float topHeight = textureOffset(heightMap, texCoord, off.yz).x * heightScale + heightOffset;
-    vec3 uDiff = normalize(vec3(size.xy, rightHeight - leftHeight));
-    vec3 vDiff = normalize(vec3(size.yx, topHeight - bottomHeight));
-    return normalize(cross(uDiff, vDiff));    
-}
 
 void main()
 {
@@ -69,9 +51,6 @@ void main()
     vec4 p10 = gl_in[2].gl_Position;
     vec4 p11 = gl_in[3].gl_Position;
 
-    // compute surface normal
-    vec3 normal = getNormalFromHeightMap(heightMap, texCoord);
-
     // bilinearly interpolate position coordinate across patch
     vec4 p0 = (p01 - p00) * u + p00;
     vec4 p1 = (p11 - p10) * u + p10;
@@ -82,16 +61,23 @@ void main()
     vec4 bp = p + up * heightOffset;
 
     // ----------------------------------------------------------------------
-    // output patch point position in clip space
-    if (renderToDepthMap)
-        gl_Position = lightSpaceMatrix * model * tp;
-    else {
-        gl_Position = projection * view * model * tp;
-        tese_out.color = texture(diffuseMap, texCoord).rgb;
-        tese_out.bottomPoint = projection * view * model * bp;
-        tese_out.normal = transpose(inverse(mat3(model))) * normal;
-        tese_out.fragPosLightSpace = lightSpaceMatrix * model * tp;
-        tese_out.clipDistance = dot(model * tp, clipPlane);
-        tese_out.bottomClipDistance = dot(model * bp, vec4(0.0, 1.0, 0.0, -1.0));
+    // output patch point position in clip space    
+    gl_Position = model * tp;
+    tese_out.color = texture(diffuseMap, texCoord).rgb;
+    tese_out.bottomPoint = model * bp;
+    tese_out.clipDistance = dot(model * tp, clipPlane);
+    tese_out.bottomClipDistance = dot(model * bp, vec4(0.0, 1.0, 0.0, -1.0));
+    if (texCoord.x < 0.001 || texCoord.x > 0.999 || texCoord.y < 0.001 || texCoord.y > 0.999) {
+        tese_out.isAdjacentToBorder = true;
+        tese_out.isCloseToBorder = false;
     }
+    else if (texCoord.x < 0.01 || texCoord.x > 0.99 || texCoord.y < 0.01 || texCoord.y > 0.99) {
+        tese_out.isAdjacentToBorder = false;
+        tese_out.isCloseToBorder = true;
+    }
+    else {
+        tese_out.isAdjacentToBorder = false;
+        tese_out.isCloseToBorder = false;
+    }
+    
 }
