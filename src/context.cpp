@@ -222,7 +222,7 @@ glm::vec4 Context::getClipPlane() {
     if (isRenderingReflection)
         return glm::vec4(0.0f, 1.0f, 0.0f, -water->waterLevel);
     else
-        return glm::vec4(0.0f, -1.0f, 0.0f, water->waterLevel);
+        return glm::vec4(0.0f, -1.0f, 0.0f, water->waterLevel+0.25f); // add a small offset to avoid artifacts on border
 }
 
 void Context::renderGUI() {
@@ -314,13 +314,13 @@ void Context::renderGUI() {
             ImGui::Checkbox("render water", &renderWater);
             ImGui::Checkbox("use DUDV", &water->useDUDV);
             ImGui::SliderFloat("water level", &water->waterLevel, 0.0f, 20.0f);
-            ImGui::SliderFloat("water size", &water->waterSize, 10.0f, 100.0f);
             ImGui::SliderFloat("wave speed", &water->WAVE_SPEED, 0.0f, 0.2f);
             ImGui::SliderFloat("tiling factor", &water->tiling, 1.0f, 10.0f);
         }
 
         if (ImGui::CollapsingHeader("Fog")) {
             ImGui::Checkbox("render fog", &renderFog);
+            ImGui::ColorEdit3("fog color", glm::value_ptr(fog->fogColor));
             ImGui::SliderFloat("fog density", &fog->fogDensity, 0.0f, 10000.0f);
         }
     }
