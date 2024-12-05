@@ -198,10 +198,10 @@ void Context::_renderToScreen() {
             FXAAShader->use();
             FXAAShader->bindTexture("screenTexture", antiAliasingScreenBuffer.get());
             FXAAShader->setVec2("u_texelStep", glm::vec2(1.0f / width, 1.0f / height));
-            FXAAShader->setFloat("u_lumaThreshold", 0.5f);
-            FXAAShader->setFloat("u_mulReduce", 1.0f / 8.0f);
-            FXAAShader->setFloat("u_minReduce", 1.0f / 128.0f);
-            FXAAShader->setFloat("u_maxSpan", 8.0f);
+            FXAAShader->setFloat("u_lumaThreshold", lumaThreshold);
+            FXAAShader->setFloat("u_mulReduce", mulReduce);
+            FXAAShader->setFloat("u_minReduce", minReduce);
+            FXAAShader->setFloat("u_maxSpan", maxSpan);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glEnable(GL_DEPTH_TEST);
         }
