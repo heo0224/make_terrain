@@ -37,6 +37,10 @@ void Water::render() {
     model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     waterShader->setMat4("model", model);
     waterShader->setBool("useDUDV", useDUDV);
+    waterShader->setBool("useNormalMap", useNormalMap);
+    waterShader->setBool("useSpecular", specular);
+    waterShader->setVec3("lightColor", context->light->color);
+    waterShader->setVec3("lightPos", context->light->lightDistance * context->light->direction);
     float moveFactor = WAVE_SPEED * glfwGetTime();
     moveFactor = fmod(moveFactor, 1.0f);
     waterShader->setFloat("moveFactor", moveFactor);

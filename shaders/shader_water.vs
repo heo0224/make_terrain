@@ -23,5 +23,6 @@ void main()
 	Out.TexCoord = vec2(aTexCoord.x, aTexCoord.y);
     Out.Pos = projection * view * worldPos;
     Out.toCamera = cameraPos - worldPos.xyz;
+    Out.fromLight = worldPos.xyz - lightPos;
 	gl_Position = projection * view * model * vec4(aPos, 1.0f);
 }
