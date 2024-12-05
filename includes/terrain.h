@@ -36,7 +36,7 @@ private:
     std::unique_ptr<Shader> normalShader;
     std::unique_ptr<Texture> heightMap;
     std::unique_ptr<Texture> diffuseMap;
-    unsigned int VAO;
+    unsigned int VAO = 0;
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
 };
