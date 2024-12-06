@@ -102,13 +102,11 @@ void Terrain::render() {
     );
     glm::mat4 view = context->getViewMatrix();
     glm::mat4 projection = context->getProjectionMatrix();
-    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
 
     shader->use();
     shader->setMat4("model", model);
     shader->setMat4("view", view);
     shader->setMat4("projection", projection);
-    shader->setMat3("normalMatrix", normalMatrix);
 
     // terrain
     shader->bindTexture("heightMap", heightMap.get(), 0);
@@ -149,7 +147,6 @@ void Terrain::render() {
         normalShader->setMat4("model", model);
         normalShader->setMat4("view", view);
         normalShader->setMat4("projection", projection);
-        normalShader->setMat3("normalMatrix", normalMatrix);
         normalShader->bindTexture("heightMap", heightMap.get(), 0);
         normalShader->setFloat("heightScale", heightScale);
         normalShader->setFloat("heightOffset", heightOffset);

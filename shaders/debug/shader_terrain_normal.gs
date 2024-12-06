@@ -21,7 +21,6 @@ const vec3 lightDirColor = vec3(1.0, 0.5, 0.0);
 
 uniform mat4 view;
 uniform mat4 projection;
-uniform mat3 normalMatrix;
 uniform vec3 lightDir;
 uniform bool showNormals;
 uniform bool showLightDirection;
@@ -39,7 +38,6 @@ void main()
     vec4 v1 = gl_in[1].gl_Position;
     vec4 v2 = gl_in[2].gl_Position;
     vec3 normal = normalize(cross(vec3(v2 - v0), vec3(v1 - v0)));
-    normal = normalize(normalMatrix * normal);
 
     if (showNormals) {
         generateLine(v0, v0 + vec4(normal, 0.0) * MAGNITUDE, normalColor);
