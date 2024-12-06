@@ -328,7 +328,9 @@ void Context::renderGUI() {
         if (ImGui::CollapsingHeader("Fog")) {
             ImGui::Checkbox("render fog", &renderFog);
             ImGui::ColorEdit3("fog color", glm::value_ptr(fog->fogColor));
-            ImGui::SliderFloat("fog density", &fog->fogDensity, 0.0f, 10000.0f);
+            ImGui::SliderFloat("fog density", &fog->fogDensity, 0.0f, 2.5f);
+            ImGui::Checkbox("layered fog", &fog->isLayeredFog);
+            ImGui::SliderFloat("fog height", &fog->fogHeight, 1.0f, 10.0f);
         }
     }
     ImGui::End();
