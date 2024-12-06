@@ -22,6 +22,11 @@ uniform float moveFactor;
 uniform float tiling;
 const float waveStrength = 0.01;
 
+
+float randomFloat(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
 void main()
 {
     vec2 ndc = (In.Pos.xy / In.Pos.w) * 0.5 + 0.5;
@@ -44,6 +49,12 @@ void main()
     vec3 normal = vec3(0.0,1.0,0.0);
     if (useNormalMap)
     {
+        // random noise
+        // vec2 tileIndex = floor(texCoord);
+        // vec2 offset = 0.05*vec2(randomFloat(texCoord*0.01), randomFloat(texCoord*0.01 + vec2(1.0, 0.0)));
+        // vec2 modifiedUV = texCoord + offset;
+
+        // normal = texture(normalMap, modifiedUV).rgb;
         normal = texture(normalMap, texCoord).rgb;
         normal = normalize(vec3(normal.x * 2.0 - 1.0, normal.z, normal.y*2.0 - 1.0));
     }
@@ -51,7 +62,7 @@ void main()
     vec3 reflectedLight = -reflect(normalize(In.fromLight), normal);
     float specular = max(dot(reflectedLight, normalize(In.toCamera)), 0.0);
     vec3 specularColor = vec3(0.8, 0.8, 0.8);
-    vec3 specularHighlight = 0.5 * lightColor * pow(specular, 20);
+    vec3 specularHighlight = 0.4 * lightColor * pow(specular, 20);
 
     vec4 reflectionColor = texture(reflectionTexture, reflectionTexCoord);
     vec4 refractionColor = texture(refractionTexture, refractionTexCoord);
