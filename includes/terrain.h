@@ -14,6 +14,7 @@ public:
     void render();
     void resetTerrain(const std::string& terrainDir);
 
+    const std::string initTerrain = "Rolling Hills Height Map 1k";
     float heightScale = 9.0f;
     float heightOffset = 0.0f;
     float horizontalScale = 30.0f;

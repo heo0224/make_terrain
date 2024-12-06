@@ -37,7 +37,11 @@ bool Context::init() {
     fs::path baseDir = "../assets/Terrain";
     for (const auto& entry : fs::directory_iterator(baseDir)) {
         if (fs::is_directory(entry)) {
-            terrainDirs.push_back(entry.path().filename().string());
+            std::string terrainName = entry.path().filename().string();
+            terrainNames.push_back(terrainName);
+            if (terrainName == terrain->initTerrain) {
+                currentTerrainIdx = terrainNames.size() - 1;
+            }
         }
     }
     return true;
@@ -222,18 +226,18 @@ glm::vec4 Context::getClipPlane() {
     if (isRenderingReflection)
         return glm::vec4(0.0f, 1.0f, 0.0f, -water->waterLevel);
     else
-        return glm::vec4(0.0f, -1.0f, 0.0f, water->waterLevel+0.25f); // add a small offset to avoid artifacts on border
+        return glm::vec4(0.0f, -1.0f, 0.0f, water->waterLevel + 0.25f); // add a small offset to avoid artifacts on border
 }
 
 void Context::renderGUI() {
     if (ImGui::Begin("UI Window Example")) {
-        if (ImGui::BeginCombo("Terrain Selection", terrainDirs[currentTerrainIdx].c_str())) {
-            for (int i = 0; i < terrainDirs.size(); i++) {
+        if (ImGui::BeginCombo("Terrain Selection", terrainNames[currentTerrainIdx].c_str())) {
+            for (int i = 0; i < terrainNames.size(); i++) {
                 bool isSelected = (currentTerrainIdx == i);
-                if (ImGui::Selectable(terrainDirs[i].c_str(), isSelected)) {
+                if (ImGui::Selectable(terrainNames[i].c_str(), isSelected)) {
                     currentTerrainIdx = i;
-                    SPDLOG_INFO("Selected terrain: {}", terrainDirs[i]);
-                    terrain->resetTerrain(terrainDirs[i]);
+                    SPDLOG_INFO("Selected terrain: {}", terrainNames[i]);
+                    terrain->resetTerrain(terrainNames[i]);
                 }
                 if (isSelected)
                     ImGui::SetItemDefaultFocus();

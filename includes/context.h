@@ -61,7 +61,7 @@ private:
     float lastY = WINDOW_HEIGHT / 2.0f;
     float deltaTime = 0.0f;
     float lastTime = 0.0f;
-    std::vector<std::string> terrainDirs;
+    std::vector<std::string> terrainNames;
     int currentTerrainIdx = -1;
 
     // flags
