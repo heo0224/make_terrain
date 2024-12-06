@@ -14,7 +14,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-uniform vec3 lightPos;
+uniform vec3 lightDir;
 uniform vec3 cameraPos;
 
 void main()
@@ -23,5 +23,6 @@ void main()
 	Out.TexCoord = vec2(aTexCoord.x, aTexCoord.y);
     Out.Pos = projection * view * worldPos;
     Out.toCamera = cameraPos - worldPos.xyz;
+    Out.fromLight = -lightDir;
 	gl_Position = projection * view * model * vec4(aPos, 1.0f);
 }

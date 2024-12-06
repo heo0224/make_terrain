@@ -27,6 +27,7 @@ void Water::render() {
     waterShader->bindTexture("reflectionTexture", reflectionBuffer.get(), 0);
     waterShader->bindTexture("refractionTexture", refractionBuffer.get(), 1);
     waterShader->bindTexture("dudvMap", dudvMap.get(), 2);
+    waterShader->bindTexture("normalMap", normalMap.get(), 3);
     waterVAO = generatePositionTextureVAOWithEBO(quadPositionTextures, sizeof(quadPositionTextures), quadIndices, sizeof(quadIndices));
     glBindVertexArray(waterVAO);
     waterShader->setMat4("projection", context->getProjectionMatrix());
@@ -37,6 +38,10 @@ void Water::render() {
     model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     waterShader->setMat4("model", model);
     waterShader->setBool("useDUDV", useDUDV);
+    waterShader->setBool("useNormalMap", useNormalMap);
+    waterShader->setBool("useSpecular", specular);
+    waterShader->setVec3("lightColor", context->light->color);
+    waterShader->setVec3("lightDir", context->light->direction);
     float moveFactor = WAVE_SPEED * glfwGetTime();
     moveFactor = fmod(moveFactor, 1.0f);
     waterShader->setFloat("moveFactor", moveFactor);

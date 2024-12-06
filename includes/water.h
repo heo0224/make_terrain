@@ -22,6 +22,8 @@ public:
     float waterSize = 100.0f;
     float tiling = 10.0f;
     bool useDUDV = true;
+    bool useNormalMap = true;
+    bool specular = true;
 private:
     void init();
     Context* context;
