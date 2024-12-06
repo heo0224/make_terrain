@@ -25,7 +25,15 @@ void Fog::render() {
     fogShader->setVec3("fogColor", fogColor);
     fogShader->setFloat("fogDensity", fogDensity);
     fogShader->setFloat("nearPlane", 0.1f);
-    fogShader->setFloat("farPlane", 100000.0f);
+    fogShader->setFloat("farPlane", 10.0f);
+
+    view = context->getViewMatrix();
+    projection = context->getProjectionMatrix();
+    fogShader->setMat4("invView", glm::inverse(view));
+    fogShader->setMat4("invProjection", glm::inverse(projection));
+    fogShader->setVec3("cameraPosition", context->getCameraPosition());
+    fogShader->setFloat("fogHeight", fogHeight);
+    fogShader->setBool("isLayeredFog", isLayeredFog);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
