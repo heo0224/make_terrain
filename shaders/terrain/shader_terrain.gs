@@ -20,7 +20,6 @@ out GS_OUT {
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 lightSpaceMatrix;
-uniform mat3 normalMatrix;
 uniform bool showGround;
 uniform bool renderToDepthMap;
 
@@ -56,7 +55,6 @@ void addTriangle(vec4 v0, vec4 v1, vec4 v2, int idx0, int idx1, int idx2)
 {
     vec3 normal;
     normal = normalize(cross(vec3(v2 - v0), vec3(v1 - v0)));
-    normal = normalize(normalMatrix * normal);
     emitVertexWithAttributes(v0, normal, idx0);
     emitVertexWithAttributes(v1, normal, idx1);
     emitVertexWithAttributes(v2, normal, idx2);
@@ -65,22 +63,8 @@ void addTriangle(vec4 v0, vec4 v1, vec4 v2, int idx0, int idx1, int idx2)
 
 void addQuad(vec4 v0, vec4 v1, vec4 v2, vec4 v3, int idx0, int idx1, int idx2, int idx3)
 {
-    vec3 normal;
-    // first triangle
-    normal = normalize(cross(vec3(v2 - v0), vec3(v1 - v0)));
-    normal = normalize(normalMatrix * normal);
-    emitVertexWithAttributes(v0, normal, idx0);
-    emitVertexWithAttributes(v1, normal, idx1);
-    emitVertexWithAttributes(v2, normal, idx2);
-    EndPrimitive();
-
-    // second triangle
-    normal = normalize(cross(vec3(v3 - v0), vec3(v2 - v0)));
-    normal = normalize(normalMatrix * normal);
-    emitVertexWithAttributes(v2, normal, idx2);
-    emitVertexWithAttributes(v3, normal, idx3);
-    emitVertexWithAttributes(v0, normal, idx0);
-    EndPrimitive();
+    addTriangle(v0, v1, v2, idx0, idx1, idx2);  // first triangle
+    addTriangle(v0, v2, v3, idx0, idx2, idx3);  // second triangle
 }
 
 void emitVertexWithAttributes(vec4 pos, vec3 normal, int idx) {
