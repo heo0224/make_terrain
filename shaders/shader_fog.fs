@@ -49,11 +49,13 @@ float CalculateFogFactor(float depth) {
   float linearizedDepth =
       LinearizeDepth(depth) / farPlane; // linearize and normalize depth
   float fogFactor = exp(-pow(linearizedDepth * fogDensity, 2.0f));
+  if (depth > 0.999)
+    return clamp(fogFactor, 0.2, 1.0);
 
   return clamp(fogFactor, 0.0, 1.0);
 }
 
-float CalculateLayerdFogFactor(vec3 worldSpaceCoords) {
+float CalculateLayerdFogFactor(vec3 worldSpaceCoords, float depth) {
   // project world space coordinates to xz plane
   vec3 worldSpaceCoordsProj = worldSpaceCoords;
   worldSpaceCoordsProj.y = 0.0;
@@ -69,33 +71,41 @@ float CalculateLayerdFogFactor(vec3 worldSpaceCoords) {
   float densityIntegral = 0.0;
 
   if (cameraPosition.y > fogHeight) {     // camera is above fog
-    if (worldSpaceCoords.y < fogHeight) { // fragment is below fog
+    if (worldSpaceCoords.y < fogHeight && depth < 0.999) { // fragment is below fog and not skybox
       deltaY = (fogHeight - worldSpaceCoords.y) / fogHeight;
       densityIntegral = 0.5 * deltaY * deltaY;
     }      // when fragment is above fog, density integral is 0
   } else { // camera is below fog
     if (worldSpaceCoords.y < fogHeight) { // fragment is below fog
-      deltaY = abs(cameraPosition.y - worldSpaceCoords.y) / fogHeight;
-      float deltaYCamera = (fogHeight - cameraPosition.y) / fogHeight;
-      float densityIntegralCamera = 0.5 * deltaYCamera * deltaYCamera;
-      float deltaYFragment = (fogHeight - worldSpaceCoords.y) / fogHeight;
-      float densityIntegralFragment = 0.5 * deltaYFragment * deltaYFragment;
-      densityIntegral = abs(densityIntegralFragment - densityIntegralCamera);
+      if (depth > 0.999) {
+        return CalculateFogFactor(depth);
+      } else {
+        deltaY = abs(cameraPosition.y - worldSpaceCoords.y) / fogHeight;
+        float deltaYCamera = (fogHeight - cameraPosition.y) / fogHeight;
+        float densityIntegralCamera = 0.5 * deltaYCamera * deltaYCamera;
+        float deltaYFragment = (fogHeight - worldSpaceCoords.y) / fogHeight;
+        float densityIntegralFragment = 0.5 * deltaYFragment * deltaYFragment;
+        densityIntegral = abs(densityIntegralFragment - densityIntegralCamera);
+      }
     } else { // fragment is above fog
-      deltaY = (fogHeight - cameraPosition.y) / fogHeight;
-      densityIntegral = 0.5 * deltaY * deltaY;
+      if (depth > 0.999) {
+        return CalculateFogFactor(depth);
+      } else {
+        deltaY = (fogHeight - cameraPosition.y) / fogHeight;
+        densityIntegral = 0.5 * deltaY * deltaY;
+      }
     }
   }
 
-  float fogDensity = 0.0;
+  float integratedFogDensity = 0.0;
 
   if (deltaY < 0.0001) {
     deltaY = 0.0001;
   }
 
-  fogDensity = sqrt(1.0 + pow(deltaD / deltaY, 2.0)) * densityIntegral;
+  integratedFogDensity = sqrt(1.0 + pow(deltaD / deltaY, 2.0)) * densityIntegral;
 
-  float fogFactor = exp(-fogDensity);
+  float fogFactor = exp(-fogDensity * integratedFogDensity);
 
   return clamp(fogFactor, 0.0, 1.0);
 }
@@ -108,12 +118,12 @@ void main() {
 
   fogFactor = CalculateFogFactor(depth);
 
-  // if (!isLayeredFog)
-  //   fogFactor = CalculateFogFactor(depth);
-  // else {
-  //   vec3 worldSpaceCoords = getWorldSpacePosition();
-  //   fogFactor = CalculateLayerdFogFactor(worldSpaceCoords);
-  // }
+  if (!isLayeredFog)
+    fogFactor = CalculateFogFactor(depth);
+  else {
+    vec3 worldSpaceCoords = getWorldSpacePosition();
+    fogFactor = CalculateLayerdFogFactor(worldSpaceCoords, depth);
+  }
 
   vec3 finalColor = mix(fogColor, color.rgb, fogFactor);
 
