@@ -108,6 +108,9 @@ void Context::render() {
     _renderToFogFramebuffer();
     _renderToAntiAliasingScreenBuffer();
     _renderToScreen();
+    // rotate camera on y axis for demo
+    camera->rotateCamera(1.0f);
+    
 }
 
 void Context::_renderToShadowFramebuffer() {
