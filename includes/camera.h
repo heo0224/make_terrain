@@ -52,6 +52,7 @@ public:
     void processMouseScroll(float yoffset);
     void reset();
     void invertPitch();
+    void rotateCamera(float theta);
 private:
     void updateCameraVectors();
 };
