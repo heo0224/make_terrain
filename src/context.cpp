@@ -66,6 +66,8 @@ void Context::processInput(GLFWwindow* window) {
         camera->processKeyboard(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         camera->processKeyboard(DOWN, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+        camera->rotateCamera(1.0f);  // rotate camera on y axis for demo
 }
 
 void Context::reshape(int width, int height) {
@@ -108,9 +110,6 @@ void Context::render() {
     _renderToFogFramebuffer();
     _renderToAntiAliasingScreenBuffer();
     _renderToScreen();
-    // rotate camera on y axis for demo
-    camera->rotateCamera(1.0f);
-    
 }
 
 void Context::_renderToShadowFramebuffer() {
