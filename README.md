@@ -4,8 +4,8 @@
 Watch our video from <a href="https://www.youtube.com/watch?v=Mm_f1qEdOP0" target="_blank">Youtube</a>!
 
 <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-  <img src="./github/preview1.gif" alt="Image 1" style="height: 250px;">
-  <img src="./github/GUI.png" alt="Image 2" style="height: 250px;">
+  <img src="./github/GUI.png" alt="Image 1" style="height: 270px;">
+  <img src="./github/preview1.gif" alt="Image 2" style="height: 270px;">
 </div>
 
 
