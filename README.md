@@ -6,8 +6,6 @@ Watch our video from <a href="https://www.youtube.com/watch?v=Mm_f1qEdOP0" targe
 <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
   <img src="./github/preview1.gif" alt="Image 1" style="height: 250px;">
   <img src="./github/GUI.png" alt="Image 2" style="height: 250px;">
-  <img src="./github/preview1.gif" alt="Image 1" style="height: 250px;">
-  <img src="./github/GUI.png" alt="Image 2" style="height: 250px;">
 </div>
 
 
