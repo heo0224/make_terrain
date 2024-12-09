@@ -36,9 +36,6 @@ make_terrain
 ### Camera Control
 - `W/S/A/D/Q/E`: camera movement
 - `R`: camera rotation
-- `R`: camera rotation
-- `R`: camera rotation
-- `R`: camera rotation
 - `Mouse`: camera view direction **(right button should be pressed)**
 
 ### References
