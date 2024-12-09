@@ -3,9 +3,10 @@
 
 Watch our video from <a href="https://www.youtube.com/watch?v=Mm_f1qEdOP0" target="_blank">Youtube</a>!
 
-![GUI](./github/GUI.png)
-![Demo](./github/preview1.gif)
-
+<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+  <img src="./github/preview1.gif" alt="Image 1" style="height: 200px;">
+  <img src="./github/GUI.png" alt="Image 2" style="height: 200px;">
+</div>
 ![Rendered Results](./github/preview.png)
 
 ### Project Structure
@@ -33,7 +34,14 @@ make_terrain
 ### Camera Control
 - `W/S/A/D/Q/E`: camera movement
 - `R`: camera rotation
+- `R`: camera rotation
 - `Mouse`: camera view direction **(right button should be pressed)**
+
+### References
+- <a href="https://www.motionforgepictures.com/height-maps/" target="_blank">Resources</a>
+- <a href="https://github.com/ocornut/imgui" target="_blank">GUI</a>
+- <a href="https://medium.com/@vincehnguyen/simplest-way-to-render-pretty-water-in-opengl-7bce40cbefbe" target="_blank">Simplest way to render pretty water in OpenGL</a>
+- <a href="https://www.youtube.com/watch?v=BYbIs1C7rkM&t=292s" target="_blank">Mastering Fog Rendering in OpenGL</a>
 
 ### References
 - <a href="https://www.motionforgepictures.com/height-maps/" target="_blank">Resources</a>
