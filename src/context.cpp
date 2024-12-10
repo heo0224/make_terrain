@@ -21,6 +21,7 @@ bool Context::init() {
     water = std::make_unique<Water>(this);
     fog = std::make_unique<Fog>(this);
     depthMap = Framebuffer::create(1024, 1024, AttachmentType::DEPTH);
+    debugScreenBuffer = Framebuffer::create(1024, 1024, AttachmentType::COLOR);
     antiAliasingScreenBuffer = Framebuffer::create(width, height, AttachmentType::COLOR);
     fogScreenBuffer = Framebuffer::create(width, height, AttachmentType::COLOR_AND_DEPTH);
     screenQuadVAO = generatePositionTextureVAO(screenQuadVertices, sizeof(screenQuadVertices));
@@ -344,26 +345,26 @@ void Context::renderGUI() {
     //     int newHeight = (int)contentSize.y;
 
     //     // resize the framebuffer if needed
-    //     if (newWidth != sceneBuffer->width || newHeight != sceneBuffer->height) {
+    //     if (newWidth != debugScreenBuffer->width || newHeight != debugScreenBuffer->height) {
     //         newWidth = newWidth > 0 ? newWidth : 1;   // Avoid zero size
     //         newHeight = newHeight > 0 ? newHeight : 1;
-    //         sceneBuffer->resizeFramebuffer(newWidth, newHeight);
+    //         debugScreenBuffer->resizeFramebuffer(newWidth, newHeight);
     //     }
 
     //     // render the scene to the framebuffer
-    //     sceneBuffer->bind();
-    //     glViewport(0, 0, sceneBuffer->width, sceneBuffer->height);
+    //     debugScreenBuffer->bind();
+    //     glViewport(0, 0, debugScreenBuffer->width, debugScreenBuffer->height);
     //     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //     depthQuadShader->use();
     //     depthQuadShader->bindTexture("depthMap", depthMap.get());
-    //     glBindVertexArray(quadVAO);
-    //     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //     glBindVertexArray(screenQuadVAO);
+    //     glDrawArrays(GL_TRIANGLES, 0, 6);
     //     glBindVertexArray(0);
-    //     sceneBuffer->unbind();
+    //     debugScreenBuffer->unbind();
 
     //     // display the framebuffer texture
     //     ImGui::Image(
-    //         (ImTextureID)sceneBuffer->texture,
+    //         (ImTextureID)debugScreenBuffer->texture,
     //         contentSize,
     //         ImVec2(0.0f, 1.0f),
     //         ImVec2(1.0f, 0.0f)

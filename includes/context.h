@@ -49,6 +49,7 @@ private:
     std::unique_ptr<Fog> fog;
     std::unique_ptr<Framebuffer> depthMap;
     std::unique_ptr<Framebuffer> fogScreenBuffer;
+    std::unique_ptr<Framebuffer> debugScreenBuffer;
     std::unique_ptr<Framebuffer> antiAliasingScreenBuffer;
     std::unique_ptr<Shader> depthQuadShader;
     std::unique_ptr<Shader> FXAAShader;
